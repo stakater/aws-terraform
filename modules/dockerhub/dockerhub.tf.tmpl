@@ -48,7 +48,7 @@ resource "aws_launch_configuration" "dockerhub" {
 }
 
 resource "aws_iam_instance_profile" "dockerhub" {
-    name = "dockerhub"
+    name = "${var.cluster_name}_dockerhub"
     roles = ["${aws_iam_role.dockerhub.name}"]
 }
 

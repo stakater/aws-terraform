@@ -4,7 +4,7 @@ resource "aws_iam_user" "deployment" {
     path = "/system/"
 }
 resource "aws_iam_user_policy" "deployment" {
-    name = "deployment"
+    name = "${var.cluster_name}_deployment"
     user = "${aws_iam_user.deployment.name}"
     policy = "${file(\"policies/deployment_policy.json\")}"
 }

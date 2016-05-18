@@ -58,7 +58,7 @@ resource "aws_launch_configuration" "elk" {
 }
 
 resource "aws_iam_instance_profile" "elk" {
-    name = "elk"
+    name = "${var.cluster_name}_elk"
     roles = ["${aws_iam_role.elk.name}"]
 }
 

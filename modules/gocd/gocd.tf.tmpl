@@ -49,7 +49,7 @@ resource "aws_launch_configuration" "gocd" {
 }
 
 resource "aws_iam_instance_profile" "gocd" {
-    name = "gocd"
+    name = "${var.cluster_name}_gocd"
     roles = ["${aws_iam_role.gocd.name}"]
 }
 

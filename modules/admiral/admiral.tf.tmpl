@@ -57,7 +57,7 @@ resource "aws_launch_configuration" "admiral" {
 }
 
 resource "aws_iam_instance_profile" "admiral" {
-    name = "admiral"
+    name = "${var.cluster_name}_admiral"
     roles = ["${aws_iam_role.admiral.name}"]
 }
 
