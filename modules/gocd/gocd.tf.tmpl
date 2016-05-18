@@ -1,10 +1,10 @@
 #
-# etcd cluster autoscale group configurations
+# gocd autoscale group configurations
 #
-resource "aws_autoscaling_group" "etcd" {
-  name = "etcd"
+resource "aws_autoscaling_group" "gocd" {
+  name = "gocd"
   # This placeholder will be replaced by array of variables defined for availability zone in the module's variables
-  availability_zones = [ "${var.etcd_subnet_az_a}", "${var.etcd_subnet_az_b}" ]
+  availability_zones = <%MODULE-AZ-VARIABLES-ARRAY%>
   min_size = "${var.cluster_min_size}"
   max_size = "${var.cluster_max_size}"
   desired_capacity = "${var.cluster_desired_capacity}"
@@ -12,27 +12,26 @@ resource "aws_autoscaling_group" "etcd" {
   health_check_type = "EC2"
   force_delete = true
 
-  launch_configuration = "${aws_launch_configuration.etcd.name}"
+  launch_configuration = "${aws_launch_configuration.gocd.name}"
   # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables
-  vpc_zone_identifier = [ "${var.etcd_subnet_a_id}", "${var.etcd_subnet_b_id}" ]
+  vpc_zone_identifier = <%MODULE-ID-VARIABLES-ARRAY%>
 
   tag {
     key = "Name"
-    value = "etcd"
+    value = "gocd"
     propagate_at_launch = true
   }
 }
 
-resource "aws_launch_configuration" "etcd" {
+resource "aws_launch_configuration" "gocd" {
   # use system generated name to allow changes of launch_configuration
-  # name = "etcd-${var.ami}"
+  # name = "workder-${var.ami}"
   image_id = "${var.ami}"
   instance_type = "${var.image_type}"
-  iam_instance_profile = "${aws_iam_instance_profile.etcd.name}"
-  security_groups = [ "${aws_security_group.etcd.id}" ]
+  iam_instance_profile = "${aws_iam_instance_profile.gocd.name}"
+  security_groups = [ "${aws_security_group.gocd.id}" ]
   key_name = "${var.keypair}"
   lifecycle { create_before_destroy = true }
-  depends_on = [ "aws_iam_instance_profile.etcd", "aws_security_group.etcd" ]
 
   # /root
   root_block_device = {
@@ -49,22 +48,19 @@ resource "aws_launch_configuration" "etcd" {
   user_data = "${file("cloud-config/s3-cloudconfig-bootstrap.sh")}"
 }
 
-# setup the etcd ec2 profile, role and polices
-resource "aws_iam_instance_profile" "etcd" {
-    name = "etcd"
-    roles = ["${aws_iam_role.etcd.name}"]
-    depends_on = [ "aws_iam_role.etcd" ]
+resource "aws_iam_instance_profile" "gocd" {
+    name = "gocd"
+    roles = ["${aws_iam_role.gocd.name}"]
 }
 
-resource "aws_iam_role_policy" "etcd_policy" {
-    name = "etcd_policy"
-    role = "${aws_iam_role.etcd.id}"
-    policy = "${file(\"policies/etcd_policy.json\")}"
-    depends_on = [ "aws_iam_role.etcd" ]
+resource "aws_iam_role_policy" "gocd_policy" {
+    name = "gocd"
+    role = "${aws_iam_role.gocd.id}"
+    policy = "${file(\"policies/gocd_policy.json\")}"
 }
 
-resource "aws_iam_role" "etcd" {
-    name = "${var.cluster_name}_etcd"
+resource "aws_iam_role" "gocd" {
+    name = "${var.cluster_name}_gocd"
     path = "/"
     assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
 }
