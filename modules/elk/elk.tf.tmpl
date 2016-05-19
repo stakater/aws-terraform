@@ -63,7 +63,7 @@ resource "aws_iam_instance_profile" "elk" {
 }
 
 resource "aws_iam_role_policy" "elk_policy" {
-    name = "{var.cluster_name}_elk"
+    name = "${var.cluster_name}_elk"
     role = "${aws_iam_role.elk.id}"
     policy = "${file(\"policies/elk_policy.json\")}"
 }

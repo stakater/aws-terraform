@@ -18,7 +18,7 @@ destroy_elk: | $(TF_PORVIDER)
 		$(SCRIPTS)/aws-keypair.sh -d elk; \
 		$(TF_DESTROY) -target module.elk.aws_autoscaling_group.elk; \
 		$(TF_DESTROY) -target module.elk.aws_launch_configuration.elk; \
-		$(TF_DESTROY) -target module.elk 
+		$(TF_DESTROY) -target module.elk
 
 clean_elk: destroy_elk
 	rm -f $(BUILD)/module-elk.tf
@@ -32,13 +32,13 @@ elk_ips:
 
 upload_elk_userdata: init_build_dir
 	cd $(BUILD); \
-		$(SCRIPTS)/gen-userdata.sh elk $(CONFIG)/cloudinit-elk.def
+		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_elk $(CONFIG)/cloudinit-elk.def
 
 # upload_confs
 # uploads confing folder to config s3 bucket; by keeping the folder structure
 upload_configs:
-	$(SCRIPTS)/upload-config.sh elk $(MODULES)/elk/config/logstash.conf
+	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_elk $(MODULES)/elk/config/logstash.conf
 
-.PHONY: elk destroy_elk refresh_elk plan_elk init_elk 
+.PHONY: elk destroy_elk refresh_elk plan_elk init_elk
 .PHONY: clean_elk upload_elk_userdata elk_ips
 .PHONY: upload_configs
