@@ -18,7 +18,7 @@ destroy_etcd: | $(TF_PORVIDER)
 	  $(SCRIPTS)/aws-keypair.sh -d etcd; \
 		$(TF_DESTROY) -target module.etcd.aws_autoscaling_group.etcd; \
 		$(TF_DESTROY) -target module.etcd.aws_launch_configuration.etcd; \
-		$(TF_DESTROY) -target module.etcd 
+		$(TF_DESTROY) -target module.etcd
 
 clean_etcd: destroy_etcd
 	rm -f $(BUILD)/module-etcd.tf
@@ -29,7 +29,7 @@ init_etcd: init
 
 upload_etcd_userdata: init_build_dir
 	cd $(BUILD); \
-		$(SCRIPTS)/gen-userdata.sh etcd $(CONFIG)/cloudinit-etcd.def
+		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_etcd $(CONFIG)/cloudinit-etcd.def
 
 etcd_ips:
 	@echo "etcd public ips: " `$(SCRIPTS)/get-ec2-public-id.sh etcd`

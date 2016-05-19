@@ -3,6 +3,7 @@
 ###################
 # Profile/Cluster name
 AWS_PROFILE := coreos-cluster
+# Cluster name may only contain letters (Uppercase & lowercase), numbers or the characters . _ -
 CLUSTER_NAME := coreos-cluster
 # To prevent you mistakenly using a wrong account (and end up destroying live environment),
 # a list of allowed AWS account IDs should be defined:

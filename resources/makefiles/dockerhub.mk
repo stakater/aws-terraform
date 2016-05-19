@@ -18,7 +18,7 @@ destroy_dockerhub: | $(TF_PORVIDER)
 		$(SCRIPTS)/aws-keypair.sh -d dockerhub; \
 		$(TF_DESTROY) -target module.dockerhub.aws_autoscaling_group.dockerhub; \
 		$(TF_DESTROY) -target module.dockerhub.aws_launch_configuration.dockerhub; \
-		$(TF_DESTROY) -target module.dockerhub 
+		$(TF_DESTROY) -target module.dockerhub
 
 clean_dockerhub: destroy_dockerhub
 	rm -f $(BUILD)/module-dockerhub.tf
@@ -32,7 +32,7 @@ dockerhub_ips:
 
 upload_dockerhub_userdata: init_build_dir
 	cd $(BUILD); \
-		$(SCRIPTS)/gen-userdata.sh dockerhub $(CONFIG)/cloudinit-dockerhub.def
+		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_dockerhub $(CONFIG)/cloudinit-dockerhub.def
 
-.PHONY: dockerhub destroy_dockerhub refresh_dockerhub plan_dockerhub init_dockerhub 
+.PHONY: dockerhub destroy_dockerhub refresh_dockerhub plan_dockerhub init_dockerhub
 .PHONY: clean_dockerhub upload_dockerhub_userdata dockerhub_ips

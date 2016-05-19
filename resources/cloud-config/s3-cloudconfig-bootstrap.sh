@@ -2,11 +2,11 @@
 
 # This is a CLUSTER-NAME-cloudinit bootstrap script. It is passed in as 'user-data' file during the machine build.
 # Then the script is excecuted to download the CoreOs "cloud-config.yaml" file  and "intial-cluster" files.
-# These files  will configure the system to join the CoreOS cluster. The second stage cloud-config.yaml can 
+# These files  will configure the system to join the CoreOS cluster. The second stage cloud-config.yaml can
 # be changed to allow system configuration changes wihtout having to rebuild the system. All it takes is a reboot.
 # If this script changes, the machine will need to be rebuild (user-data change)
 
-# Convention: 
+# Convention:
 # 1. A bucket should exist that contains role-based cloud-config.yaml
 #  e.g. <account-id>-CLUSTER-NAME-cloudinit/<roleProfile>/cloud-config.yaml
 # 2. All machines should have instance role profile, with a policy that allows readonly access to this bucket.
@@ -34,20 +34,20 @@ x-amz-security-token:${s3Token}
 ${resource}"
 }
 
-# Log curl call 
+# Log curl call
 debug_log () {
     echo ""  >> /tmp/s3-bootstrap.log
-    echo "curl -s -O -H \"Host: ${bucket}.s3.amazonaws.com\" 
-  -H \"Content-Type: ${contentType}\" 
-	-H \"Authorization: AWS ${s3Key}:${signature}\" 
-	-H \"x-amz-security-token:${s3Token}\" 
-	-H \"Date: ${dateValue}\" 
+    echo "curl -s -O -H \"Host: ${bucket}.s3.amazonaws.com\"
+  -H \"Content-Type: ${contentType}\"
+	-H \"Authorization: AWS ${s3Key}:${signature}\"
+	-H \"x-amz-security-token:${s3Token}\"
+	-H \"Date: ${dateValue}\"
 	https://${bucket}.s3.amazonaws.com/${filePath} " >> /tmp/s3-bootstrap.log
 }
 
 # Instance profile
 roleProfile=$(curl -s http://169.254.169.254/latest/meta-data/iam/info \
-	| grep -Eo 'instance-profile/([a-zA-Z.-]+)' \
+	| grep -Eo 'instance-profile/([a-zA-Z0-9._-]+)' \
 	| sed  's#instance-profile/##')
 
 # AWS Account
@@ -61,7 +61,7 @@ bucket=${accountId}-CLUSTER-NAME-cloudinit
 cloudConfigYaml="${roleProfile}/cloud-config.yaml"
 
 # path to initial-cluster urls file
-initialCluster="etcd/initial-cluster"
+initialCluster="CLUSTER-NAME_etcd/initial-cluster"
 
 # Find token, AccessKeyId,  line, remove leading space, quote, commas
 s3Token=$(get_value "Token")
@@ -101,7 +101,7 @@ curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
 
 ########################################################################
 # Download CLUSTER-NAME-cloudinit/<profile>/clould-config.yaml
-# 
+#
 # And replace ipv4 vars in clould-config.yaml
 # because oem-cloudinit.service does it only on native "user-data", i.e. this script.
 ########################################################################
