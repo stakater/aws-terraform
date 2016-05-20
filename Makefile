@@ -3,15 +3,33 @@
 ###################
 # Profile/Cluster name
 AWS_PROFILE := coreos-cluster
+# Cluster name may only contain letters (Uppercase & lowercase), numbers or the characters . _ -
 CLUSTER_NAME := coreos-cluster
 # To prevent you mistakenly using a wrong account (and end up destroying live environment),
 # a list of allowed AWS account IDs should be defined:
 #ALLOWED_ACCOUNT_IDS := "123456789012","012345678901"
 
-# For get-ami.sh
-COREOS_UPDATE_CHANNE=beta
-AWS_REGION=us-west-2
+# For get-vars.sh
+COREOS_UPDATE_CHANNEL=beta
 VM_TYPE=hvm
+# For route53.tf
+PRIVATE_DOMAIN=$(CLUSTER_NAME).local
+
+# For gen-vpc-subnet-modules-tf.sh
+VPC_SUBNET_MODULES=etcd,admiral,worker,elb,rds
+
+# Supported Subnet AWS availability zones
+# Update these values according to the zones available to your AWS account
+AZ_US_EAST_1=us-east-1b,us-east-1c,us-east-1d,us-east-1e
+AZ_US_WEST_1=us-west-1a,us-west-1b
+AZ_US_WEST_2=us-west-2a,us-west-2b,us-west-2c
+AZ_EU_WEST_1=eu-west-1a,eu-west-1b,eu-west-1c
+AZ_EU_CETNRAL_1=eu-central-1a,eu-central-1b
+AZ_AP_SOUTHEAST_1=ap-southeast-1a,ap-southeast-1b
+AZ_AP_SOUTHEAST_2=ap-southeast-2a,ap-southeast-2b,ap-southeast-2c
+AZ_AP_NORTHEAST_1=ap-northeast-1a,ap-northeast-1c
+AZ_AP_NORTHEAST_2=ap-northeast-2a,ap-northeast-2c
+AZ_SA_EAST_1=sa-east-1a,sa-east-1b,sa-east-1c
 
 # Working Directories
 ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -24,7 +42,8 @@ CONFIG := $(BUILD)/cloud-config
 CERTS := $(BUILD)/certs
 SITE_CERT := $(CERTS)/site.pem
 POLICIES := $(BUILD)/policies
-AMI_VARS=$(BUILD)/ami.tf
+MODULE_VARS=$(BUILD)/module_vars.tf
+VPC_MODULE=$(MODULES)/vpc
 
 # Terraform files
 TF_PORVIDER := $(BUILD)/provider.tf
@@ -53,7 +72,7 @@ help:
 	@echo "Available resources: vpc s3 route53 iam efs elb etcd worker dockerhub admiral rds"
 	@echo "For example: make plan_worker # to show what resources are planned for worker"
 
-destroy: 
+destroy:
 	@echo "Usage: make destroy_<resource>"
 	@echo "For example: make destroy_worker"
 	@echo "Node: destroy may fail because of outstanding dependences"
@@ -74,7 +93,7 @@ destroy_all: \
 	destroy_vpc
 
 clean_all: destroy_all
-	rm -f $(BUILD)/*.tf 
+	rm -f $(BUILD)/*.tf
 	#rm -f $(BUILD)/terraform.tfstate
 
 # TODO: Push/Pull terraform states from a tf state repo

@@ -18,7 +18,7 @@ destroy_admiral: | $(TF_PORVIDER)
 		$(SCRIPTS)/aws-keypair.sh -d admiral; \
 		$(TF_DESTROY) -target module.admiral.aws_autoscaling_group.admiral; \
 		$(TF_DESTROY) -target module.admiral.aws_launch_configuration.admiral; \
-		$(TF_DESTROY) -target module.admiral 
+		$(TF_DESTROY) -target module.admiral
 
 clean_admiral: destroy_admiral
 	rm -f $(BUILD)/module-admiral.tf
@@ -32,6 +32,6 @@ admiral_ips:
 
 upload_admiral_userdata: init_build_dir
 	cd $(BUILD); \
-		$(SCRIPTS)/gen-userdata.sh admiral $(CONFIG)/cloudinit-admiral.def
+		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_admiral $(CONFIG)/cloudinit-admiral.def
 
 .PHONY: admiral destroy_admiral refresh_admiral plan_admiral init_admiral clean_admiral upload_admiral_userdata admiral_ips

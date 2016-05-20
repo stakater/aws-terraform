@@ -4,7 +4,7 @@ worker: etcd plan_worker upload_worker_userdata
 		$(TF_APPLY) -target module.worker
 	@$(MAKE) worker_ips
 
-plan_worker: plan_etcd init_worker 
+plan_worker: plan_etcd init_worker
 	cd $(BUILD); \
 		$(TF_PLAN) -target module.worker;
 
@@ -18,7 +18,7 @@ destroy_worker: | $(TF_PORVIDER)
 	  $(SCRIPTS)/aws-keypair.sh -d worker; \
 		$(TF_DESTROY) -target module.worker.aws_autoscaling_group.worker; \
 		$(TF_DESTROY) -target module.worker.aws_launch_configuration.worker; \
-		$(TF_DESTROY) -target module.worker 
+		$(TF_DESTROY) -target module.worker
 
 clean_worker: destroy_worker
 	rm -f $(BUILD)/module-worker.tf
@@ -32,6 +32,6 @@ worker_ips:
 
 upload_worker_userdata: init_build_dir
 	cd $(BUILD); \
-		$(SCRIPTS)/gen-userdata.sh worker $(CONFIG)/cloudinit-worker.def
+		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_worker $(CONFIG)/cloudinit-worker.def
 
 .PHONY: worker destroy_worker refresh_worker plan_worker init_worker clean_worker upload_worker_userdata worker_ips

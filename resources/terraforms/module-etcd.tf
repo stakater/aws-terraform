@@ -11,7 +11,8 @@ module "etcd" {
     aws_account_id="${var.aws_account.id}"
     aws_region = "${var.aws_account.default_region}"
     ami = "${var.ami}"
-
+    cluster_name = "${var.cluster_name}"
+    
     # Note: currently etcd launch_configuration devices can NOT be changed after etcd cluster is up
     # See https://github.com/hashicorp/terraform/issues/2910
     docker_volume_size = 12
@@ -20,11 +21,13 @@ module "etcd" {
     # vpc
     vpc_id = "${module.vpc.vpc_id}"
     vpc_cidr = "${module.vpc.vpc_cidr}"
-    etcd_subnet_a_id = "${module.vpc.etcd_subnet_a_id}"
-    etcd_subnet_b_id = "${module.vpc.etcd_subnet_b_id}"
-    etcd_subnet_c_id = "${module.vpc.etcd_subnet_c_id}"
-    etcd_subnet_az_a = "${module.vpc.etcd_subnet_az_a}"
-    etcd_subnet_az_b = "${module.vpc.etcd_subnet_az_b}"
-    etcd_subnet_az_c = "${module.vpc.etcd_subnet_az_c}"
 
+    # This placeholder will be replaced by MODULE subnet id and availability zone variables
+    # For more information look into 'substitute-VPC-AZ-placeholders.sh'
+    
+		etcd_subnet_a_id = "${module.vpc.etcd_subnet_a_id}"
+		etcd_subnet_b_id = "${module.vpc.etcd_subnet_b_id}"
+	
+		etcd_subnet_az_a = "${module.vpc.etcd_subnet_az_a}"
+		etcd_subnet_az_b = "${module.vpc.etcd_subnet_az_b}"
 }

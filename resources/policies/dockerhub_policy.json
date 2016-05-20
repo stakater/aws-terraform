@@ -18,9 +18,9 @@
         "s3:Get*"
       ],
       "Resource": [
-        "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/etcd/initial-cluster",
-        "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/dockerhub",
-        "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/dockerhub/*",
+        "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/CLUSTER-NAME_etcd/initial-cluster",
+        "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/CLUSTER-NAME_dockerhub",
+        "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/CLUSTER-NAME_dockerhub/*",
         "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-config",
         "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-config/*"
       ]

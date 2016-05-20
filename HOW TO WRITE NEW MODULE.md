@@ -1,11 +1,12 @@
 # Step 1: Add new folder `<module-name>` in modules section
 
-Then create three terraform files:
+Then create terraform and terraform template files as follows:
 
-1. `<module-name>`.tf
+1. `<module-name>`.tf.tmpl
 2. security.tf
-3. variables.tf
+3. variables.tf.tmpl
 
+The terraform template files (.tf.tmpl) can contain certai placeholders (such as placeholders for availability zones and etc) which are replaced when .tf files are generated from them
 look others for inspiration; most of the times they are similiar except few simple name changes.
 
 # Step 2: Create `<module-name>.yaml` file
@@ -34,11 +35,13 @@ e.g.
 
 `elk_policy.json`
 
-# Step 5: Create terraform
+# Step 5: Create terraform template
 
-module-<module-name>.tf
+module-<module-name>.tf.tmpl
 
-`module-elk.tf`
+`module-elk.tf.tmpl`
+
+The terraform template files (.tf.tmpl) can contain certai placeholders (such as placeholders for availability zones variables and etc) which are replaced when .tf files are generated from them
 
 # Step 6: Create make file
 
@@ -46,5 +49,14 @@ module-<module-name>.tf
 
 `elk.mk`
 
-# Step 6: Upload configurations
+# Step 7: Define configurations
+
+if your systemd unit which runs a docker container needs some configuration then you can put them under a config folder of that module
+
+(and it will be automatically uploaded and downloaded into the instance under /etc/configs/); still WIP
+
+# Step 8: Define Subnet?
+
+not sure but we might need to setup <module-name>-subnet.tf in vpc module; but i don't think its mandatory for simple modules; need to check with xu wang
+
 

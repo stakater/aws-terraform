@@ -1,11 +1,12 @@
 resource "aws_db_subnet_group" "coreos_cluster" {
-    name = "coreos-cluster-db"
-    description = "db subnets for coreos-cluster applications"
-    subnet_ids = ["${var.rds_subnet_a_id}","${var.rds_subnet_b_id}","${var.rds_subnet_c_id}"]
+    name = "${var.cluster_name}-db"
+    description = "db subnets for ${var.cluster_name} applications"
+    # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables
+    subnet_ids = [ "${var.rds_subnet_a_id}", "${var.rds_subnet_b_id}" ]
 }
 
 resource "aws_db_instance" "coreos_cluster" {
-    identifier = "coreos-cluster"
+    identifier = "${var.cluster_name}"
     allocated_storage = 10
     engine = "postgres"
     engine_version = "9.3.5"
@@ -14,7 +15,7 @@ resource "aws_db_instance" "coreos_cluster" {
     name = "dockerage"
     username = "${var.db_user}"
     password = "${var.db_password}"
-    multi_az = "false" 
+    multi_az = "false"
     availability_zone = "${var.rds_subnet_az_b}"
     port = "5432"
     publicly_accessible = "false"

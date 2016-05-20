@@ -18,7 +18,7 @@ destroy_gocd: | $(TF_PORVIDER)
 		$(SCRIPTS)/aws-keypair.sh -d gocd; \
 		$(TF_DESTROY) -target module.gocd.aws_autoscaling_group.gocd; \
 		$(TF_DESTROY) -target module.gocd.aws_launch_configuration.gocd; \
-		$(TF_DESTROY) -target module.gocd 
+		$(TF_DESTROY) -target module.gocd
 
 clean_gocd: destroy_gocd
 	rm -f $(BUILD)/module-gocd.tf
@@ -32,7 +32,7 @@ gocd_ips:
 
 upload_gocd_userdata: init_build_dir
 	cd $(BUILD); \
-		$(SCRIPTS)/gen-userdata.sh gocd $(CONFIG)/cloudinit-gocd.def
+		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_gocd $(CONFIG)/cloudinit-gocd.def
 
-.PHONY: gocd destroy_gocd refresh_gocd plan_gocd init_gocd 
+.PHONY: gocd destroy_gocd refresh_gocd plan_gocd init_gocd
 .PHONY: clean_gocd upload_gocd_userdata gocd_ips

@@ -1,5 +1,5 @@
 variable "allow_ssh_cidr" { default = "0.0.0.0/0" }
-variable "aws_region" { default = "us-west-2" }
+variable "aws_region" { }
 variable "aws_account_id" { }
 variable "ami" { }
 variable "image_type" { default = "t2.micro" }
@@ -10,13 +10,16 @@ variable "keypair" { default = "admiral" }
 variable "root_volume_size" { default = 12 }
 variable "docker_volume_size" { default = 12 }
 variable "data_volume_size" { default = 12 }
+variable "cluster_name" { }
 
 # networking vars set by module.vpc
 variable "vpc_id" { }
 variable "vpc_cidr" { }
-variable "admiral_subnet_a_id" { }
-variable "admiral_subnet_b_id" { }
-variable "admiral_subnet_c_id" { }
-variable "admiral_subnet_az_a" { }
-variable "admiral_subnet_az_b" { }
-variable "admiral_subnet_az_c" { }
+
+# This placeholder will be replaced by module subnet id and availability zone tf variable definations
+# For more information look into 'substitute-VPC-AZ-placeholders.sh'
+
+		variable "admiral_subnet_a_id" { }
+		variable "admiral_subnet_az_a" { }
+		variable "admiral_subnet_b_id" { }
+		variable "admiral_subnet_az_b" { }
