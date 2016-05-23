@@ -1,0 +1,24 @@
+[Unit]
+Description=kibana
+Requires=etcd.service
+Requires=docker.service
+Requires=elasticsearch.service
+After=etcd.service
+After=docker.service
+After=elasticsearch.service
+
+[Service]
+TimeoutSec=0
+EnvironmentFile=/etc/environment
+EnvironmentFile=/var/lib/apps/elk/envvars
+
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker pull ${KIBANA_IMAGE}
+
+ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e PUBLIC_IPV4=${COREOS_PUBLIC_IPV4} -e PRIVATE_IPV4=${COREOS_PRIVATE_IPV4} ${KIBANA_OPTS} ${KIBANA_IMAGE}"
+ExecStartPost=/usr/bin/etcdctl set /services/kibana/host '{"IP": "${COREOS_PUBLIC_IPV4}", "HttpPort": ${KIBANA_PUBLIC_PORT} }'
+ExecStop=-/usr/bin/docker stop %n
+ExecStopPost=/usr/bin/etcdctl rm /services/kibana/host
+RestartSec=10
+Restart=always

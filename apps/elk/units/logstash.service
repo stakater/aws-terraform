@@ -1,0 +1,22 @@
+[Unit]
+Description=Logstash
+Requires=docker.service
+After=docker.service
+Wants=elasticsearch.service
+After=elasticsearch.service
+
+[Service]
+EnvironmentFile=/etc/environment
+EnvironmentFile=/var/lib/apps/elk/envvars
+TimeoutStartSec=20min
+ExecStartPre=/usr/bin/docker pull ${LOGSTASH_IMAGE}
+ExecStartPre=-/usr/bin/docker rm  %n
+ExecStart=/usr/bin/sh -c "/usr/bin/docker run  --rm --name %n ${LOGSTASH_OPTS} ${LOGSTASH_IMAGE} logstash -f /var/lib/logstash/config/logstash.conf"
+
+ExecStartPost=/usr/bin/etcdctl set /logstash/host ${COREOS_PUBLIC_IPV4}
+ExecStop=-/usr/bin/docker stop %n
+RestartSec=10
+Restart=always
+
+[X-Fleet]
+MachineOf=elasticsearch.service

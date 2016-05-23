@@ -1,0 +1,15 @@
+[Unit]
+Description=elasticsearch
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+EnvironmentFile=/var/lib/apps/elk/envvars
+TimeoutStartSec=0
+ExecStartPre=/usr/bin/docker pull ${ELASTICSEARCH_IMAGE}
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n ${ELASTICSEARCH_OPTS} ${ELASTICSEARCH_IMAGE} elasticsearch"
+ExecStop=/usr/bin/docker stop %n
+RestartSec=10
+Restart=always
