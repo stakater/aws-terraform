@@ -1,0 +1,31 @@
+/* VPN Server -> Creating an EC2 instance on AWS */
+resource "aws_instance" "amicreation" {
+  name = "amicreation-${var.ami}"
+  count = 1
+  ami   = "${var.ami}"
+  availability_zone ="<%AMICREATION-AZ-VARIABLE%>"
+  instance_type = "${var.image_type}"
+   # /root
+  root_block_device = {
+    volume_type = "gp2"
+    volume_size = "${var.root_volume_size}"
+  }
+  # /var/lib/docker
+  ebs_block_device = {
+    device_name = "/dev/sdb"
+    volume_type = "gp2"
+    volume_size = "${var.docker_volume_size}"
+  }
+
+  key_name      = "${var.keypair}"
+  subnet_id     = "${aws_subnet.aminator.id}"
+  security_groups = ["${aws_security_group.amicreation.id}"]
+ 
+   provisioner "local-exec" {
+        command = "echo ${aws_instance.aminator.id} > ../ami_creation/file.txt"
+    }
+
+
+  user_data = "${file("cloud-config/amicreation.yaml")}"
+
+}
