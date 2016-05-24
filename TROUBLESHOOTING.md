@@ -67,6 +67,18 @@ Global units will be run on all machines in the cluster.
 
 # What are `fleet` commands?
 
+Note: Make sure you fleet is running, if not
+run fleet by 
+```
+sudo systemctl start fleet
+```
+
+after starting fleet you must start etcd(or etcd2) again explicitly by
+```
+sudo systemctl start etcd
+```
+
+Fleet Commands: 
 ```
 fleetctl submit hello.service
 ```
