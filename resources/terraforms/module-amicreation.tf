@@ -4,7 +4,7 @@ module "amicreation" {
     # amicreation cluster_desired_capacity should be in odd numbers, e.g. 3, 5, 9
     cluster_desired_capacity = 1
     image_type = "t2.micro"
-    keypair = "etcd"
+    keypair = "amicreation"
     allow_ssh_cidr="0.0.0.0/0"
 
     # aws

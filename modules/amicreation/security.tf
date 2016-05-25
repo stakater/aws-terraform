@@ -19,6 +19,6 @@ resource "aws_security_group" "amicreation" {
   }
 
   tags {
-      Name = "amicreatioi"
+      Name = "amicreation"
   }
 }
