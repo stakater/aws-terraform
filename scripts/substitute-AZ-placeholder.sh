@@ -37,5 +37,5 @@ do
   newFile="${f%%.tmpl*}"
   cp $f $newFile
 	# Replace placeholders with their respective values in the new tf file
-	perl -p -i -e "s/<%AMICREATION-AZ-VARIABLE%>/${AVAIL_ZONES[0]}/g" "${newFile}"
+	perl -p -i -e "s/<%AMICREATION-AZ-VARIABLE%>/\"${AVAIL_ZONES[0]}\"/g" "${newFile}"
 done

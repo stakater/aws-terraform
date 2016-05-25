@@ -30,7 +30,7 @@ init_build_dir:
 	@$(SCRIPTS)/substitute-AWS-ACCOUNT.sh $(POLICIES)/*.json
 	@$(SCRIPTS)/substitute-CLUSTER-NAME.sh $(CONFIG)/*.yaml $(POLICIES)/*.json $(CONFIG)/s3-cloudconfig-bootstrap.sh
 	@$(SCRIPTS)/substitute-VPC-AZ-placeholders.sh $(MODULES) $(TF_RESOURCES)/*.tf.tmpl
-	@$(SCRIPTS)/substitute-AZ-placeholders.sh $(MODULES)
+	@$(SCRIPTS)/substitute-AZ-placeholder.sh $(MODULES)
 
 update_vars:	| $(BUILD)
 	# Generate default AMI ids

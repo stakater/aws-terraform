@@ -23,8 +23,6 @@ module "amicreation" {
     # vpc
     vpc_id = "${module.vpc.vpc_id}"
     vpc_cidr = "${module.vpc.vpc_cidr}"
-
-    # This placeholder will be replaced by MODULE subnet id and availability zone variables
-    # For more information look into 'substitute-VPC-AZ-placeholders.sh'
-    <%MODULE-SUBNET-IDS-AND-AZS%>
+    etcd_subnet_a_id = "${module.vpc.etcd_subnet_a_id}"
+    
 }

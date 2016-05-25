@@ -15,3 +15,4 @@ variable "cluster_name" { }
 # networking vars set by module.vpc
 variable "vpc_id" { }
 variable "vpc_cidr" { }
+variable "etcd_subnet_a_id" {}
