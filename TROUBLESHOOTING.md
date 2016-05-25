@@ -99,7 +99,25 @@ fleetctl journal hello.service
 ```
 fleetctl destroy hello.service
 ```
+# What are `etcd` commands?
 
+To see list of top level keys:
+```
+etcdctl ls
+```
+
+To see whether the result is a directory or key, e.g. if there was one result `/coreos.com`
+```
+etcdctl get /coreos.com
+```
+it will return the value if it is a key or say that the given argument is a directory.
+You can use the `etcdctl ls <directory-path>` command again to browse further in the directory 
+Or use the `etcdctl get <key-path>` command to get value of the key 
+
+To see list of all keys/directories in etcd
+```
+etcdctl ls / --recursive
+```
 # How to make a new shell script executable?
 
 ```
