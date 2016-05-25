@@ -24,3 +24,6 @@ resource "aws_instance" "amicreation" {
   user_data = "${file("cloud-config/amicreation.yaml")}"
 }
 
+output "instance_id" {
+    value = "${aws_instance.amicreation.id}"
+}

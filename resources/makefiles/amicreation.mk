@@ -1,4 +1,4 @@
-amicreation: vpc plan_amicreation upload_amicreation_userdata
+amicreation: vpc plan_amicreation upload_amicreation_userdata snapshot
 	cd $(BUILD); \
 		$(SCRIPTS)/aws-keypair.sh -c amicreation; \
 		$(TF_APPLY) -target module.amicreation
