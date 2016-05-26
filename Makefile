@@ -16,7 +16,7 @@ VM_TYPE=hvm
 PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 
 # For gen-vpc-subnet-modules-tf.sh
-VPC_SUBNET_MODULES=etcd,admiral,worker,elb,rds
+VPC_SUBNET_MODULES=etcd,admiral,worker,elb,rds,amicreation
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account

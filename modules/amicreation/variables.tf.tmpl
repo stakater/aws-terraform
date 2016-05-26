@@ -15,4 +15,6 @@ variable "cluster_name" { }
 # networking vars set by module.vpc
 variable "vpc_id" { }
 variable "vpc_cidr" { }
-variable "etcd_subnet_a_id" {}
+# This placeholder will be replaced by module subnet id and availability zone tf variable definations
+# For more information look into 'substitute-VPC-AZ-placeholders.sh'
+<%MODULE-SUBNET-VARIABLES%>

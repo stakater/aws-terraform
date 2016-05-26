@@ -17,7 +17,7 @@ resource "aws_instance" "amicreation" {
   }
 
   key_name      = "${var.keypair}"
-  subnet_id = "${var.etcd_subnet_a_id}"
+  subnet_id =  <%AMICREATION-SUBNET-VARIABLE%>
   security_groups = ["${aws_security_group.amicreation.id}"]
  
 

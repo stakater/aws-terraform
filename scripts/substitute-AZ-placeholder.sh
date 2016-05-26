@@ -30,12 +30,16 @@ IFS=',' read -r -a AVAIL_ZONES <<< "${AWS_AZS["${AWS_REGION}"]}"
 TF_MODULES_FILES=$(find $TF_MODULES_DIRECTORY -type f -iname "*.tf.tmpl")
 
 # find files which contain any of the three placeholders
-files=$(grep -s -l -e \<%AMICREATION-AZ-VARIABLE%\> -r $TF_MODULES_FILES)
+files=$(grep -s -l -e \<%AMICREATION-AZ-VARIABLE%\> -e \<%AMICREATION-SUBNET-VARIABLE%\> -r $TF_MODULES_FILES)
 for f in $files
 do
 # create a new file tf file without the .tmpl extension
   newFile="${f%%.tmpl*}"
   cp $f $newFile
 	# Replace placeholders with their respective values in the new tf file
+	zone_letter=${AVAIL_ZONES[0]: -1}
+	SUBNET_VAR="\"\${var.amicreation_subnet_${zone_letter}_id}\""
+
+	perl -p -i -e "s/<%AMICREATION-SUBNET-VARIABLE%>/${SUBNET_VAR}/g" "${newFile}"
 	perl -p -i -e "s/<%AMICREATION-AZ-VARIABLE%>/\"${AVAIL_ZONES[0]}\"/g" "${newFile}"
 done
