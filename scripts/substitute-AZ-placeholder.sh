@@ -1,6 +1,7 @@
 #!/bin/bash
 #######################################################
-## THIS SCRIPT SUBSTITUTES VPC AVAILABILITY ZONE RELATED PLACEHOLDERS
+## THIS FILE IS ONLY USED FOR AMICREATION MODULE AS WE NEED TO CREATE A STANDALONE INSTANCE IN ONLY SINGLE AVAILIBILITY ZONE
+## THIS SCRIPT SUBSTITUTES AMICREATION AVAILABILITY ZONE AND SUBNET ID RELATED PLACEHOLDERS
 ## IN $(BUILD)/.terraform/modules/*.tf AND $(BUILD)/*.tf FILES
 #######################################################
 
@@ -38,7 +39,7 @@ do
   cp $f $newFile
 	# Replace placeholders with their respective values in the new tf file
 	zone_letter=${AVAIL_ZONES[0]: -1}
-	SUBNET_VAR="\"\${var.amicreation_subnet_${zone_letter}_id}\""
+	SUBNET_VAR="\\\"\\\${var.amicreation_subnet_${zone_letter}_id}\\\""
 
 	perl -p -i -e "s/<%AMICREATION-SUBNET-VARIABLE%>/${SUBNET_VAR}/g" "${newFile}"
 	perl -p -i -e "s/<%AMICREATION-AZ-VARIABLE%>/\"${AVAIL_ZONES[0]}\"/g" "${newFile}"
