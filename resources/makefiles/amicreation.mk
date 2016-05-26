@@ -29,6 +29,7 @@ init_amicreation: init
 upload_amicreation_userdata: init_build_dir
 	cd $(BUILD); \
 		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_amicreation $(CONFIG)/cloudinit-amicreation.def
+	sleep 30
 
 amicreation_ips:
 	@echo "amicreation public ips: " `$(SCRIPTS)/get-ec2-public-id.sh amicreation`
