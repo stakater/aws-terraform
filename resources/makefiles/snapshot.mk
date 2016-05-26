@@ -1,4 +1,4 @@
-snapshot: plan_snapshot
+snapshot: amicreation plan_snapshot
 	cd $(BUILD); \
 		$(TF_APPLY) -target module.snapshot
 
