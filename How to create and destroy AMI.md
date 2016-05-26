@@ -1,3 +1,8 @@
+Before running make command for amicreation or snaphot please make sure file 'substitute-AZ-placeholder.sh' must have executable right permission. Further you can navigate to scripts directory and give executable rights to this file using this command.
+```
+chmod a+x substitute-AZ-placeholder.sh'
+```
+
 # Create Standalone Instance: 
 ```
 make amicreation 
