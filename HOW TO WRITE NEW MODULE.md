@@ -29,7 +29,7 @@ e.g.
 
 # Step 4: Create policy
 
-<module-name>_policy.json
+`<module-name>_policy.json`
 
 e.g.
 
@@ -37,7 +37,7 @@ e.g.
 
 # Step 5: Create terraform template
 
-module-<module-name>.tf.tmpl
+`module-<module-name>.tf.tmpl`
 
 `module-elk.tf.tmpl`
 
@@ -45,7 +45,7 @@ The terraform template files (.tf.tmpl) can contain certai placeholders (such as
 
 # Step 6: Create make file
 
-<module-name>.mk
+`<module-name>.mk`
 
 `elk.mk`
 
@@ -57,6 +57,12 @@ if your systemd unit which runs a docker container needs some configuration then
 
 # Step 8: Define Subnet?
 
-not sure but we might need to setup <module-name>-subnet.tf in vpc module; but i don't think its mandatory for simple modules; need to check with xu wang
+not sure but we might need to setup `<module-name>-subnet.tf` in vpc module; but i don't think its mandatory for simple modules; need to check with xu wang
 
+If you want to setup a subnet in the vpc module, Add your module name in the `VPC_SUBNET_MODULES` comma separated list in the `Makefile`
+The script `gen-vpc-subnet-modules-tf.sh` will dynamically generate the `<module-name>-subnet.tf` file according to the availability zones of the selected region.
 
+Example: 
+```
+VPC_SUBNET_MODULES=etcd,admiral,worker,elb,rds,myModule
+```
