@@ -58,6 +58,14 @@ systemctl list-units | grep fleet
 systemctl restart fleet.service
 ```
 
+# How to reload Systemd
+
+Reload systemd, scanning for new or changed units:
+```
+systemctl daemon-reload
+```
+
+
 # What are unit types?
 
 
