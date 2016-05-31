@@ -129,7 +129,13 @@ sudo chmod a+x script-name.sh
 ```
 systemctl list-unit-files
 ```
+# How to run a cloud-config file manually?
 
+Use the following command to manually run a cloud config file.
+Please make sure you stop units that have been modified or those you want to be started from the cloud config file, before running the command.
+```
+coreos-cloudinit --from-file=path/to/file/cloud-config.yaml
+```
 # How to find the mounted volumes?
 
 you can verify presence of your volume with `lsblk` command
