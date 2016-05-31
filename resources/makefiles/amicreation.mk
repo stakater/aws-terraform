@@ -1,10 +1,10 @@
-amicreation: vpc plan_amicreation upload_amicreation_userdata
+amicreation: vpc s3 iam plan_amicreation upload_amicreation_userdata
 	cd $(BUILD); \
 		$(SCRIPTS)/aws-keypair.sh -c amicreation; \
 		$(TF_APPLY) -target module.amicreation
 	@$(MAKE) amicreation_ips
 
-plan_amicreation: plan_vpc init_amicreation 
+plan_amicreation: plan_vpc plan_s3 plan_iam init_amicreation
 	cd $(BUILD); \
 		$(TF_PLAN) -target module.amicreation;
 
@@ -29,7 +29,6 @@ init_amicreation: init
 upload_amicreation_userdata: init_build_dir
 	cd $(BUILD); \
 		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_amicreation $(CONFIG)/cloudinit-amicreation.def
-	sleep 30
 
 amicreation_ips:
 	@echo "amicreation public ips: " `$(SCRIPTS)/get-ec2-public-id.sh amicreation`

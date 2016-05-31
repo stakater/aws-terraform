@@ -83,6 +83,8 @@ destroy_all: \
 	destroy_gocd \
 	destroy_elk \
 	destroy_worker \
+	destroy_snapshot \
+	destroy_amicreation \
 	destroy_etcd \
 	destroy_efs \
 	destroy_elb \
@@ -90,9 +92,7 @@ destroy_all: \
 	destroy_iam \
 	destroy_route53 \
 	destroy_s3 \
-	destroy_vpc \
-	destroy_amicreation \
-	destroy_snapshot
+	destroy_vpc
 
 clean_all: destroy_all
 	rm -f $(BUILD)/*.tf

@@ -3,3 +3,4 @@ cloud-config/amicreation.yaml
 cloud-config/systemd-units.yaml
 cloud-config/base.yaml
 cloud-config/files.yaml
+cloud-config/aws-files.yaml
