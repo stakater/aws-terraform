@@ -3,7 +3,7 @@
 # gocd cloud-config
 coreos:
   etcd2:
-    proxy: on
+    discovery: https://discovery.etcd.io/7153f3975bbba2e62260a1f6bbef737b
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
   fleet:
     public-ip: $private_ipv4
