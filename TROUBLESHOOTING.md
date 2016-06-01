@@ -144,6 +144,13 @@ Please make sure you stop units that have been modified or those you want to be 
 ```
 coreos-cloudinit --from-file=path/to/file/cloud-config.yaml
 ```
+
+#Cloud-Config locations
+```
+https://coreos.com/os/docs/latest/cloud-config-locations.html
+```
+
+
 # How to find the mounted volumes?
 
 you can verify presence of your volume with `lsblk` command
