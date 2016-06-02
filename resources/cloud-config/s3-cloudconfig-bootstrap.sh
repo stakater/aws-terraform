@@ -152,5 +152,11 @@ then
     echo "COREOS_PUBLIC_IPV4=$public_ipv4" >> /etc/environment
 fi
 
-# Run cloud-init
+# Copy the cloud-config file and replace it with the default cloud-config of coreos
+# so that our cloud-config becomes the defualt cloud-config for the coreos machine
+# Required when creating AMI so that all instances created from that AMI also have
+# this cloud config as their default on startup
+cp ${workDir}/cloud-config.yaml /usr/share/oem/cloud-config.yml
+
+# Run cloud-init (explicitly)
 coreos-cloudinit --from-file=${workDir}/cloud-config.yaml
