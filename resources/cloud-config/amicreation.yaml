@@ -16,6 +16,7 @@ coreos:
   units:
     - name: etcd2.service
       command: start
+      # TODO: Add drop-ins here, environment file of initial cluster
     - name: fleet.service
       command: start
     - name: hello.service
@@ -34,4 +35,4 @@ coreos:
         RestartSec=1
         Restart=always
         [Install]
-        WantedBy=default.target
+        WantedBy=multi-user.target
