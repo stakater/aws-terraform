@@ -7,6 +7,8 @@ modules/admiral/admiral.tf
 modules/admiral/variables.tf
 modules/amicreation/amicreation.tf
 modules/amicreation/variables.tf
+modules/application/application.tf
+modules/application/variables.tf
 modules/dockerhub/dockerhub.tf
 modules/dockerhub/variables.tf
 modules/elb/dockerhub.tf
@@ -26,6 +28,7 @@ modules/vpc/*-subnet.tf
 
 resources/terraforms/module-admiral.tf
 resources/terraforms/module-amicreation.tf
+resources/terraforms/module-application.tf
 resources/terraforms/module-dockerhub.tf
 resources/terraforms/module-elb.tf
 resources/terraforms/module-elk.tf

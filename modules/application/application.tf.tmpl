@@ -1,0 +1,70 @@
+#
+# application cluster autoscale group configurations
+#
+resource "aws_autoscaling_group" "application" {
+  name = "${var.cluster_name}_application"
+  # This placeholder will be replaced by array of variables defined for availability zone in the module's variables
+  availability_zones = <%MODULE-AZ-VARIABLES-ARRAY%>
+  min_size = "${var.cluster_min_size}"
+  max_size = "${var.cluster_max_size}"
+  desired_capacity = "${var.cluster_desired_capacity}"
+
+  health_check_type = "EC2"
+  force_delete = true
+
+  launch_configuration = "${aws_launch_configuration.application.name}"
+  # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables
+  vpc_zone_identifier = <%MODULE-ID-VARIABLES-ARRAY%>
+
+  tag {
+    key = "Name"
+    value = "application"
+    propagate_at_launch = true
+  }
+}
+
+resource "aws_launch_configuration" "application" {
+  # use system generated name to allow changes of launch_configuration
+  # name = "application-${var.snapshot_ami_id}"
+  image_id = "${var.snapshot_ami_id}"
+  instance_type = "${var.image_type}"
+  iam_instance_profile = "${aws_iam_instance_profile.application.name}"
+  security_groups = [ "${aws_security_group.application.id}" ]
+  key_name = "${var.keypair}"
+  lifecycle { create_before_destroy = true }
+
+  # /root
+  root_block_device = {
+    volume_type = "gp2"
+    volume_size = "${var.root_volume_size}"
+  }
+  # /var/lib/docker
+  ebs_block_device = {
+    device_name = "/dev/sdb"
+    volume_type = "gp2"
+    volume_size = "${var.docker_volume_size}"
+  }
+
+  # Do not give user data, as this module will use user data from the snapshot_ami_id
+  #user_data = ""
+}
+
+# setup the application ec2 profile, role and polices
+resource "aws_iam_instance_profile" "application" {
+    name = "${var.cluster_name}_application"
+    roles = ["${aws_iam_role.application.name}"]
+    depends_on = [ "aws_iam_role.application" ]
+}
+
+resource "aws_iam_role_policy" "application_policy" {
+    name = "${var.cluster_name}_application_policy"
+    role = "${aws_iam_role.application.id}"
+    policy = "${file(\"policies/application_policy.json\")}"
+    depends_on = [ "aws_iam_role.application" ]
+}
+
+resource "aws_iam_role" "application" {
+    name = "${var.cluster_name}_application"
+    path = "/"
+    assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
+}
