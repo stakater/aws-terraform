@@ -7,6 +7,9 @@ GoCD in a Box
 
 Start GoCD Services
 ======================
+Make sure you have an `envvars` file on the machine, for the variables used in the unit files.
+If not, replace the variables with their values, and remove the `EnvironmentFile` property which links to the `envvars` in the unit file, before submitting the Units.
+
     cd units
     fleetctl start gocd.service
     # wait for http://172.17.8.101:8153 is up
