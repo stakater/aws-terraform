@@ -1,6 +1,7 @@
 #
 # application cluster autoscale group configurations
-#
+# This module is Work In Progress, there are issues creating autoscaling group and launch configuration from our AMI, through terraform
+
 resource "aws_autoscaling_group" "application" {
   name = "${var.cluster_name}_application"
   # This placeholder will be replaced by array of variables defined for availability zone in the module's variables
