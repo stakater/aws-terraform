@@ -1,4 +1,4 @@
-application: snapshot plan_application
+application: ami_baker plan_application
 	echo "This module is Work In Progress, there are issues creating autoscaling group and launch configuration from our AMI, through terraform"
 	cd $(BUILD); \
 		$(SCRIPTS)/aws-keypair.sh -c application; \

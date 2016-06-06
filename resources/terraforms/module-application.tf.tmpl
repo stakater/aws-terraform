@@ -10,7 +10,7 @@ module "application" {
     # aws
     aws_account_id="${var.aws_account.id}"
     aws_region = "${var.aws_account.default_region}"
-    snapshot_ami_id = "${module.snapshot.snapshot_ami_id}"
+    ami_baker_ami_id = "${module.ami_baker.ami_baker_ami_id}"
 
     #cluster name
     cluster_name = "${var.cluster_name}"

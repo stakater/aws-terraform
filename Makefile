@@ -85,7 +85,7 @@ destroy_all: \
 	destroy_elk \
 	destroy_worker \
 	destroy_application \
-	destroy_snapshot \
+	destroy_ami_baker \
 	destroy_base_instance \
 	destroy_etcd \
 	destroy_efs \
