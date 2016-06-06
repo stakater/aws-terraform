@@ -1,10 +1,10 @@
-module "application" {
-    source = "../modules/application"
+module "application_launcher" {
+    source = "../modules/application_launcher"
 
-    # application cluster_desired_capacity should be in odd numbers, e.g. 3, 5, 9
+    # application_launcher cluster_desired_capacity should be in odd numbers, e.g. 3, 5, 9
     cluster_desired_capacity = 1
     image_type = "t2.micro"
-    keypair = "application"
+    keypair = "application_launcher"
     allow_ssh_cidr="0.0.0.0/0"
 
     # aws
@@ -15,7 +15,7 @@ module "application" {
     #cluster name
     cluster_name = "${var.cluster_name}"
 
-    # Note: currently application launch_configuration devices can NOT be changed after application cluster is up
+    # Note: currently application_launcher launch_configuration devices can NOT be changed after application_launcher cluster is up
     # See https://github.com/hashicorp/terraform/issues/2910
     docker_volume_size = 12
     root_volume_size = 12

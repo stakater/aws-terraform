@@ -1,8 +1,8 @@
 /* The AWS Security Group specifies the inbound (ingress) and outbound (egress) networking rules */
-resource "aws_security_group" "application" {
-  name   = "application"
+resource "aws_security_group" "application_launcher" {
+  name   = "application_launcher"
   vpc_id = "${var.vpc_id}"
-  description = "application"
+  description = "application_launcher"
 
   ingress {
     protocol    = -1
@@ -19,6 +19,6 @@ resource "aws_security_group" "application" {
   }
 
   tags {
-      Name = "application"
+      Name = "application_launcher"
   }
 }

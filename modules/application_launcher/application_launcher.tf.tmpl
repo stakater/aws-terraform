@@ -1,9 +1,9 @@
 #
-# application cluster autoscale group configurations
+# application_launcher cluster autoscale group configurations
 # This module is Work In Progress, there are issues creating autoscaling group and launch configuration from our AMI, through terraform
 
-resource "aws_autoscaling_group" "application" {
-  name = "${var.cluster_name}_application"
+resource "aws_autoscaling_group" "application_launcher" {
+  name = "${var.cluster_name}_application_launcher"
   # This placeholder will be replaced by array of variables defined for availability zone in the module's variables
   availability_zones = <%MODULE-AZ-VARIABLES-ARRAY%>
   min_size = "${var.cluster_min_size}"
@@ -13,24 +13,24 @@ resource "aws_autoscaling_group" "application" {
   health_check_type = "EC2"
   force_delete = true
 
-  launch_configuration = "${aws_launch_configuration.application.name}"
+  launch_configuration = "${aws_launch_configuration.application_launcher.name}"
   # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables
   vpc_zone_identifier = <%MODULE-ID-VARIABLES-ARRAY%>
 
   tag {
     key = "Name"
-    value = "application"
+    value = "application_launcher"
     propagate_at_launch = true
   }
 }
 
-resource "aws_launch_configuration" "application" {
+resource "aws_launch_configuration" "application_launcher" {
   # use system generated name to allow changes of launch_configuration
-  # name = "application-${var.ami_baker_ami_id}"
+  # name = "application_launcher-${var.ami_baker_ami_id}"
   image_id = "${var.ami_baker_ami_id}"
   instance_type = "${var.image_type}"
-  iam_instance_profile = "${aws_iam_instance_profile.application.name}"
-  security_groups = [ "${aws_security_group.application.id}" ]
+  iam_instance_profile = "${aws_iam_instance_profile.application_launcher.name}"
+  security_groups = [ "${aws_security_group.application_launcher.id}" ]
   key_name = "${var.keypair}"
   lifecycle { create_before_destroy = true }
 
@@ -50,22 +50,22 @@ resource "aws_launch_configuration" "application" {
   #user_data = ""
 }
 
-# setup the application ec2 profile, role and polices
-resource "aws_iam_instance_profile" "application" {
-    name = "${var.cluster_name}_application"
-    roles = ["${aws_iam_role.application.name}"]
-    depends_on = [ "aws_iam_role.application" ]
+# setup the application_launcher ec2 profile, role and polices
+resource "aws_iam_instance_profile" "application_launcher" {
+    name = "${var.cluster_name}_application_launcher"
+    roles = ["${aws_iam_role.application_launcher.name}"]
+    depends_on = [ "aws_iam_role.application_launcher" ]
 }
 
-resource "aws_iam_role_policy" "application_policy" {
-    name = "${var.cluster_name}_application_policy"
-    role = "${aws_iam_role.application.id}"
-    policy = "${file(\"policies/application_policy.json\")}"
-    depends_on = [ "aws_iam_role.application" ]
+resource "aws_iam_role_policy" "application_launcher_policy" {
+    name = "${var.cluster_name}_application_launcher_policy"
+    role = "${aws_iam_role.application_launcher.id}"
+    policy = "${file(\"policies/application_launcher_policy.json\")}"
+    depends_on = [ "aws_iam_role.application_launcher" ]
 }
 
-resource "aws_iam_role" "application" {
-    name = "${var.cluster_name}_application"
+resource "aws_iam_role" "application_launcher" {
+    name = "${var.cluster_name}_application_launcher"
     path = "/"
     assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
 }

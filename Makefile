@@ -84,7 +84,7 @@ destroy_all: \
 	destroy_gocd \
 	destroy_elk \
 	destroy_worker \
-	destroy_application \
+	destroy_application_launcher \
 	destroy_ami_baker \
 	destroy_base_instance \
 	destroy_etcd \
