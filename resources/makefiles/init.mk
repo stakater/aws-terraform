@@ -30,6 +30,7 @@ init_build_dir:
 	@$(SCRIPTS)/substitute-AWS-ACCOUNT.sh $(POLICIES)/*.json
 	@$(SCRIPTS)/substitute-CLUSTER-NAME.sh $(CONFIG)/*.yaml $(POLICIES)/*.json $(CONFIG)/s3-cloudconfig-bootstrap.sh
 	@$(SCRIPTS)/substitute-VPC-AZ-placeholders.sh $(MODULES) $(TF_RESOURCES)/*.tf.tmpl
+	@$(SCRIPTS)/substitute-AZ-placeholder.sh $(MODULES)
 
 update_vars:	| $(BUILD)
 	# Generate default AMI ids
@@ -54,5 +55,5 @@ gen_vpc_subnets_tf: | $(BUILD)
 	$(SCRIPTS)/gen-vpc-subnet-modules-tf.sh -d $(VPC_MODULE)
 
 
-.PHONY: init show show_state graph refresh update_vars update_provider init_build_dir
+.PHONY: init show show_state graph refresh update_vars update_provider init_build_dir init_instance_creation
 .PHONY: gen_certs clean_certs

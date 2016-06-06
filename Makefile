@@ -16,7 +16,8 @@ VM_TYPE=hvm
 PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 
 # For gen-vpc-subnet-modules-tf.sh
-VPC_SUBNET_MODULES=etcd,admiral,worker,elb,rds
+# Add all modules for which <module-name>-subnet.tf needs to be created
+VPC_SUBNET_MODULES=etcd,admiral,worker,elb,rds,base_instance
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account
@@ -83,6 +84,9 @@ destroy_all: \
 	destroy_gocd \
 	destroy_elk \
 	destroy_worker \
+	destroy_application_launcher \
+	destroy_ami_baker \
+	destroy_base_instance \
 	destroy_etcd \
 	destroy_efs \
 	destroy_elb \

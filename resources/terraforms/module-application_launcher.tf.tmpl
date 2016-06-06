@@ -1,19 +1,21 @@
-module "etcd" {
-    source = "../modules/etcd"
+module "application_launcher" {
+    source = "../modules/application_launcher"
 
-    # etcd cluster_desired_capacity should be in odd numbers, e.g. 3, 5, 9
+    # application_launcher cluster_desired_capacity should be in odd numbers, e.g. 3, 5, 9
     cluster_desired_capacity = 1
     image_type = "t2.micro"
-    keypair = "etcd"
+    keypair = "application_launcher"
     allow_ssh_cidr="0.0.0.0/0"
 
     # aws
     aws_account_id="${var.aws_account.id}"
     aws_region = "${var.aws_account.default_region}"
-    ami = "${var.ami}"
+    ami_baker_ami_id = "${module.ami_baker.ami_baker_ami_id}"
+
+    #cluster name
     cluster_name = "${var.cluster_name}"
-    
-    # Note: currently etcd launch_configuration devices can NOT be changed after etcd cluster is up
+
+    # Note: currently application_launcher launch_configuration devices can NOT be changed after application_launcher cluster is up
     # See https://github.com/hashicorp/terraform/issues/2910
     docker_volume_size = 12
     root_volume_size = 12
@@ -24,10 +26,5 @@ module "etcd" {
 
     # This placeholder will be replaced by MODULE subnet id and availability zone variables
     # For more information look into 'substitute-VPC-AZ-placeholders.sh'
-    
-		etcd_subnet_a_id = "${module.vpc.etcd_subnet_a_id}"
-		etcd_subnet_b_id = "${module.vpc.etcd_subnet_b_id}"
-	
-		etcd_subnet_az_a = "${module.vpc.etcd_subnet_az_a}"
-		etcd_subnet_az_b = "${module.vpc.etcd_subnet_az_b}"
+    <%BASEINSTANCE-SUBNET-IDS-AND-AZS%>
 }

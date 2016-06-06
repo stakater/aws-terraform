@@ -1,0 +1,71 @@
+#
+# application_launcher cluster autoscale group configurations
+# This module is Work In Progress, there are issues creating autoscaling group and launch configuration from our AMI, through terraform
+
+resource "aws_autoscaling_group" "application_launcher" {
+  name = "${var.cluster_name}_application_launcher"
+  # This placeholder will be replaced by array of variables defined for availability zone in the module's variables
+  availability_zones = <%MODULE-AZ-VARIABLES-ARRAY%>
+  min_size = "${var.cluster_min_size}"
+  max_size = "${var.cluster_max_size}"
+  desired_capacity = "${var.cluster_desired_capacity}"
+
+  health_check_type = "EC2"
+  force_delete = true
+
+  launch_configuration = "${aws_launch_configuration.application_launcher.name}"
+  # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables
+  vpc_zone_identifier = <%MODULE-ID-VARIABLES-ARRAY%>
+
+  tag {
+    key = "Name"
+    value = "application_launcher"
+    propagate_at_launch = true
+  }
+}
+
+resource "aws_launch_configuration" "application_launcher" {
+  # use system generated name to allow changes of launch_configuration
+  # name = "application_launcher-${var.ami_baker_ami_id}"
+  image_id = "${var.ami_baker_ami_id}"
+  instance_type = "${var.image_type}"
+  iam_instance_profile = "${aws_iam_instance_profile.application_launcher.name}"
+  security_groups = [ "${aws_security_group.application_launcher.id}" ]
+  key_name = "${var.keypair}"
+  lifecycle { create_before_destroy = true }
+
+  # /root
+  root_block_device = {
+    volume_type = "gp2"
+    volume_size = "${var.root_volume_size}"
+  }
+  # /var/lib/docker
+  ebs_block_device = {
+    device_name = "/dev/sdb"
+    volume_type = "gp2"
+    volume_size = "${var.docker_volume_size}"
+  }
+
+  # Do not give user data, as this module will use user data from the ami_baker_ami_id
+  #user_data = ""
+}
+
+# setup the application_launcher ec2 profile, role and polices
+resource "aws_iam_instance_profile" "application_launcher" {
+    name = "${var.cluster_name}_application_launcher"
+    roles = ["${aws_iam_role.application_launcher.name}"]
+    depends_on = [ "aws_iam_role.application_launcher" ]
+}
+
+resource "aws_iam_role_policy" "application_launcher_policy" {
+    name = "${var.cluster_name}_application_launcher_policy"
+    role = "${aws_iam_role.application_launcher.id}"
+    policy = "${file(\"policies/application_launcher_policy.json\")}"
+    depends_on = [ "aws_iam_role.application_launcher" ]
+}
+
+resource "aws_iam_role" "application_launcher" {
+    name = "${var.cluster_name}_application_launcher"
+    path = "/"
+    assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
+}
