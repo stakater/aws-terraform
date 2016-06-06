@@ -1,7 +1,7 @@
 #!/bin/bash
 #######################################################
-## THIS FILE IS ONLY USED FOR AMICREATION MODULE AS WE NEED TO CREATE A STANDALONE INSTANCE IN ONLY SINGLE AVAILIBILITY ZONE
-## THIS SCRIPT SUBSTITUTES AMICREATION AVAILABILITY ZONE AND SUBNET ID RELATED PLACEHOLDERS
+## THIS FILE IS ONLY USED FOR base_instance MODULE AS WE NEED TO CREATE A STANDALONE INSTANCE IN ONLY SINGLE AVAILIBILITY ZONE
+## THIS SCRIPT SUBSTITUTES base_instance AVAILABILITY ZONE AND SUBNET ID RELATED PLACEHOLDERS
 ## IN $(BUILD)/.terraform/modules/*.tf AND $(BUILD)/*.tf FILES
 #######################################################
 
@@ -31,7 +31,7 @@ IFS=',' read -r -a AVAIL_ZONES <<< "${AWS_AZS["${AWS_REGION}"]}"
 TF_MODULES_FILES=$(find $TF_MODULES_DIRECTORY -type f -iname "*.tf.tmpl")
 
 # find files which contain any of the three placeholders
-files=$(grep -s -l -e \<%AMICREATION-AZ-VARIABLE%\> -e \<%AMICREATION-SUBNET-VARIABLE%\> -r $TF_MODULES_FILES)
+files=$(grep -s -l -e \<%BASEINSTANCE-AZ-VARIABLE%\> -e \<%BASEINSTANCE-SUBNET-VARIABLE%\> -r $TF_MODULES_FILES)
 for f in $files
 do
 # create a new file tf file without the .tmpl extension
@@ -39,8 +39,8 @@ do
   cp $f $newFile
 	# Replace placeholders with their respective values in the new tf file
 	zone_letter=${AVAIL_ZONES[0]: -1}
-	SUBNET_VAR="\\\"\\\${var.amicreation_subnet_${zone_letter}_id}\\\""
+	SUBNET_VAR="\\\"\\\${var.base_instance_subnet_${zone_letter}_id}\\\""
 
-	perl -p -i -e "s/<%AMICREATION-SUBNET-VARIABLE%>/${SUBNET_VAR}/g" "${newFile}"
-	perl -p -i -e "s/<%AMICREATION-AZ-VARIABLE%>/\"${AVAIL_ZONES[0]}\"/g" "${newFile}"
+	perl -p -i -e "s/<%BASEINSTANCE-SUBNET-VARIABLE%>/${SUBNET_VAR}/g" "${newFile}"
+	perl -p -i -e "s/<%BASEINSTANCE-AZ-VARIABLE%>/\"${AVAIL_ZONES[0]}\"/g" "${newFile}"
 done

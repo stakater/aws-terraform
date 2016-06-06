@@ -1,8 +1,8 @@
-snapshot: amicreation plan_snapshot
+snapshot: base_instance plan_snapshot
 	cd $(BUILD); \
 		$(TF_APPLY) -target module.snapshot
 
-plan_snapshot: init_snapshot 
+plan_snapshot: init_snapshot
 	cd $(BUILD); \
 		$(TF_PLAN) -target module.snapshot;
 

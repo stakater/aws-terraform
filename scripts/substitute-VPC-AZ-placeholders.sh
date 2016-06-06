@@ -96,7 +96,7 @@ done
 ## Substitutes values in resouces/terraform/module-*.tf.tmpl files
 #######################################################
 # find files which contain any of the four placeholders
-files=$(grep -s -l -e \<%MODULE-SUBNET-IDS-AND-AZS%\> -e \<%ADMIRAL-SUBNET-IDS-AND-AZS%\> -e \<%WORKER-SUBNET-IDS-AND-AZS%\>  -e \<%AMICREATION-SUBNET-IDS-AND-AZS%\> -r $TF_FILES)
+files=$(grep -s -l -e \<%MODULE-SUBNET-IDS-AND-AZS%\> -e \<%ADMIRAL-SUBNET-IDS-AND-AZS%\> -e \<%WORKER-SUBNET-IDS-AND-AZS%\>  -e \<%BASEINSTANCE-SUBNET-IDS-AND-AZS%\> -r $TF_FILES)
 current_module_name=""
 for f in $files
 do
@@ -110,8 +110,8 @@ do
 	admiral_vpc_azs=""
 	worker_vpc_ids=""
 	worker_vpc_azs=""
-  amicreation_vpc_ids=""
-  amicreation_vpc_azs=""
+  base_instance_vpc_ids=""
+  base_instance_vpc_azs=""
 	for az_letter in ${CURRENT_REGION_AZS_LETTERS[@]}
 	do
 		# If module has own vpc subnet
@@ -132,11 +132,11 @@ do
 		worker_vpc_azs="${worker_vpc_azs}
 		${current_module_name}_subnet_az_${az_letter} = \\\"\\\${module.vpc.worker_subnet_az_${az_letter}}\\\""
 
-    # If module uses amicreation vpc subnet
-    amicreation_vpc_ids="${amicreation_vpc_ids}
-    ${current_module_name}_subnet_${az_letter}_id = \\\"\\\${module.vpc.amicreation_subnet_${az_letter}_id}\\\""
-    amicreation_vpc_azs="${amicreation_vpc_azs}
-    ${current_module_name}_subnet_az_${az_letter} = \\\"\\\${module.vpc.amicreation_subnet_az_${az_letter}}\\\""
+    # If module uses base_instance vpc subnet
+    base_instance_vpc_ids="${base_instance_vpc_ids}
+    ${current_module_name}_subnet_${az_letter}_id = \\\"\\\${module.vpc.base_instance_subnet_${az_letter}_id}\\\""
+    base_instance_vpc_azs="${base_instance_vpc_azs}
+    ${current_module_name}_subnet_az_${az_letter} = \\\"\\\${module.vpc.base_instance_subnet_az_${az_letter}}\\\""
 done
 
 	# Concatenate results
@@ -146,9 +146,9 @@ done
 	${admiral_vpc_azs}"
 	worker_result="${worker_vpc_ids}
 	${worker_vpc_azs}"
-  amicreation_result=""
-  amicreation_result="${amicreation_vpc_ids}
-  ${amicreation_vpc_azs}"
+  base_instance_result=""
+  base_instance_result="${base_instance_vpc_ids}
+  ${base_instance_vpc_azs}"
 
   # create a new file tf file without the .tmpl extension
   newFile="${f%%.tmpl*}"
@@ -158,5 +158,5 @@ done
 	perl -p -i -e "s/<%MODULE-SUBNET-IDS-AND-AZS%>/${module_result}/g" ${newFile}
 	perl -p -i -e "s/<%ADMIRAL-SUBNET-IDS-AND-AZS%>/${admiral_result}/g" ${newFile}
 	perl -p -i -e "s/<%WORKER-SUBNET-IDS-AND-AZS%>/${worker_result}/g" ${newFile}
-	perl -p -i -e "s/<%AMICREATION-SUBNET-IDS-AND-AZS%>/${amicreation_result}/g" ${newFile}
+	perl -p -i -e "s/<%BASEINSTANCE-SUBNET-IDS-AND-AZS%>/${base_instance_result}/g" ${newFile}
 done

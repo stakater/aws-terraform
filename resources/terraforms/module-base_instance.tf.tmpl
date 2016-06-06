@@ -1,10 +1,10 @@
-module "amicreation" {
-    source = "../modules/amicreation"
+module "base_instance" {
+    source = "../modules/base_instance"
 
-    # amicreation cluster_desired_capacity should be in odd numbers, e.g. 3, 5, 9
+    # base_instance cluster_desired_capacity should be in odd numbers, e.g. 3, 5, 9
     cluster_desired_capacity = 1
     image_type = "t2.micro"
-    keypair = "amicreation"
+    keypair = "base_instance"
     allow_ssh_cidr="0.0.0.0/0"
 
     # aws
@@ -15,7 +15,7 @@ module "amicreation" {
     #cluster name
     cluster_name = "${var.cluster_name}"
 
-    # Note: currently amicreation launch_configuration devices can NOT be changed after etcd cluster is up
+    # Note: currently base_instance launch_configuration devices can NOT be changed after etcd cluster is up
     # See https://github.com/hashicorp/terraform/issues/2910
     docker_volume_size = 12
     root_volume_size = 12
@@ -26,5 +26,5 @@ module "amicreation" {
     # This placeholder will be replaced by module subnet id and availability zone variables
     # For more information look into 'substitute-VPC-AZ-placeholders.sh'
     <%MODULE-SUBNET-IDS-AND-AZS%>
-    
+
 }
