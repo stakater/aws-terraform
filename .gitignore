@@ -5,6 +5,8 @@
 
 modules/admiral/admiral.tf
 modules/admiral/variables.tf
+modules/admiral_global/admiral_global.tf
+modules/admiral_global/variables.tf
 modules/base_instance/base_instance.tf
 modules/base_instance/variables.tf
 modules/application_launcher/application_launcher.tf
@@ -27,6 +29,7 @@ modules/worker/variables.tf
 modules/vpc/*-subnet.tf
 
 resources/terraforms/module-admiral.tf
+resources/terraforms/module-admiral_global.tf
 resources/terraforms/module-base_instance.tf
 resources/terraforms/module-application_launcher.tf
 resources/terraforms/module-dockerhub.tf

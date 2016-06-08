@@ -1,0 +1,205 @@
+#cloud-config
+
+coreos:
+  etcd2:
+    # generate a new token for each unique cluster from https://discovery.etcd.io/new?size=3
+    # specify the initial size of your cluster with ?size=X
+    discovery: https://discovery.etcd.io/02b7ec99d61155b93c4ff7cd5b308552
+    # multi-region and multi-cloud deployments need to use $public_ipv4
+    #advertise-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+    #initial-advertise-peer-urls: http://127.0.0.1:2380
+    # listen on both the official ports and the legacy ports
+    # legacy ports can be omitted if your application doesn't depend on them
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+    #listen-peer-urls: http://0.0.0.0:2380,http://0.0.0.0:7001
+  fleet:
+    public-ip: $private_ipv4
+    metadata: "env=CLUSTER-NAME,platform=ec2,provider=aws,role=admiral_global"
+  update:
+    reboot-strategy: off
+  units:
+    - name: etcd2.service
+      command: start
+      #TODO: Inital cluster drop-ins
+    - name: fleet.service
+      command: reload-or-restart
+    - name: docker-tcp.socket
+      command: start
+      enable: true
+      content: |
+          [Unit]
+          Description=Docker Socket for the API
+
+          [Socket]
+          ListenStream=2375
+          Service=docker.service
+          BindIPv6Only=both
+
+          [Install]
+          WantedBy=sockets.target
+    - name: format-opt-data.service
+      command: start
+      content: |
+        [Unit]
+        Description=Formats opt data drive
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        Environment="LABEL=opt-data"
+        Environment="DEV=/dev/xvdc"
+        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then  wipefs -a -f $DEV && mkfs.ext4 -F -L $LABEL $DEV && echo wiped; fi"
+    - name: opt-data.mount
+      command: start
+      content: |
+        [Unit]
+        Description=Mount data to /opt/data
+        Requires=format-opt-data.service
+        After=format-opt-data.service
+        [Mount]
+        What=/dev/xvdc
+        Where=/opt/data
+        Type=ext4
+    - name: update-window.service
+      command: start
+      content: |
+        [Unit]
+        Description=Reboot if an update has been downloaded
+        ConditionPathExists=/opt/bin/update-window.sh
+        [Service]
+        ExecStart=/opt/bin/update-window.sh
+    - name: update-window.timer
+      command: start
+      content: |
+        [Unit]
+        Description=Reboot timer
+        [Timer]
+        OnCalendar=*-*-* 05,06:00/30:00
+    - name: gocd-server.service
+      command: start
+      content: |
+        [Unit]
+        Description=gocd server
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gocd/gocd-server:16.2.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -p 8153:8153 -e AGENT_KEY=123456789abcdef -e AGENT_KEY=123456789zxcvb -e AGENT_KEY=123456789mnbvcx -e AGENT_KEY=123456789lkjhgf -e AGENT_KEY=123456789ytrewq gocd/gocd-server:16.2.1"
+        ExecStop=/usr/bin/docker stop %n
+        RestartSec=10
+        Restart=always
+    - name: gocd-agent-ci-base.service
+      command: start
+      content: |
+        [Unit]
+        Description=gocd agent # 1 for continuous integration base docker images
+        After=docker.service
+        Requires=docker.service
+        After=gocd-server.service
+        Requires=gocd-server.service
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789abcdef --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+        ExecStop=-/usr/bin/docker stop %n
+        RestartSec=10
+        Restart=always
+    - name: gocd-agent-ci-app.service
+      command: start
+      content: |
+        [Unit]
+        Description=gocd agent # 2 for continuous integration of app docker images
+        After=docker.service
+        Requires=docker.service
+        After=gocd-server.service
+        Requires=gocd-server.service
+
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789zxcvb --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+        ExecStop=-/usr/bin/docker stop %n
+        RestartSec=10
+        Restart=always
+    - name: gocd-agent-cd-dev.service
+      command: start
+      content: |
+        [Unit]
+        Description=gocd agent # 3 for continuous deployment to DEV environment
+        After=docker.service
+        Requires=docker.service
+        After=gocd-server.service
+        Requires=gocd-server.service
+
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789mnbvcx --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+        ExecStop=-/usr/bin/docker stop %n
+        RestartSec=10
+        Restart=always
+    - name: gocd-agent-cd-test.service
+      command: start
+      content: |
+        [Unit]
+        Description=gocd agent # 4 for continuous deployment to TEST environment
+        After=docker.service
+        Requires=docker.service
+        After=gocd-server.service
+        Requires=gocd-server.service
+
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789lkjhgf --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+        ExecStop=-/usr/bin/docker stop %n
+        RestartSec=10
+        Restart=always
+    - name: gocd-agent-cd-prod.service
+      command: start
+      content: |
+        [Unit]
+        Description=gocd agent # 5 for continuous deployment to PROD environment
+        After=docker.service
+        Requires=docker.service
+        After=gocd-server.service
+        Requires=gocd-server.service
+
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=0
+        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789ytrewq --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+        ExecStop=-/usr/bin/docker stop %n
+        RestartSec=10
+        Restart=always
+    - name: registry.service
+      comand: start
+      content: |
+        [Unit]
+        Description=Docker Image Registry v2
+        Requires=docker.service
+        After=docker.service
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=300
+        ExecStartPre=/usr/bin/docker pull registry:2.1.1
+        ExecStartPre=-/usr/bin/docker rm -f %n
+        ExecStartPre=if[ ! -d "/var/lib/apps-data/registry"]; then mkdir /var/lib/apps-data/registry fi
+        ExecStart=/usr/bin/docker run --rm --name %n -p 5000:5000 \
+                  -v /var/lib/apps-data/registry:/tmp/registry-dev \
+                  registry:2.1.1
+        RestartSec=5
+        Restart=always
+

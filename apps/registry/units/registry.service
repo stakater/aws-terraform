@@ -1,0 +1,17 @@
+[Unit]
+Description=Docker Image Registry
+Requires=docker.service
+After=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+Environment=DOCKER_OPTS='--insecure-registry=10.0.30.95:5000'
+TimeoutStartSec=300
+ExecStartPre=/usr/bin/docker pull registry:2.1.1
+ExecStartPre=-/usr/bin/docker rm -f %n
+ExecStartPre= if[ ! -d "/var/lib/apps-data/registry"]; then mkdir /var/lib/apps-data/registry fi
+ExecStart=/usr/bin/docker run  --rm --name %n -p 5000:5000 \
+          -v /var/lib/apps-data/registry:/tmp/registry-dev \
+          registry:2.1.1
+RestartSec=5
+Restart=always
