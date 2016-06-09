@@ -196,7 +196,7 @@ coreos:
         TimeoutStartSec=300
         ExecStartPre=/usr/bin/docker pull registry:2.1.1
         ExecStartPre=-/usr/bin/docker rm -f %n
-        ExecStartPre=if[ ! -d "/var/lib/apps-data/registry"]; then mkdir /var/lib/apps-data/registry fi
+        ExecStartPre=/bin/bash -c "if[ ! -d /var/lib/apps-data/registry]; then mkdir /var/lib/apps-data/registry fi"
         ExecStart=/usr/bin/docker run --rm --name %n -p 5000:5000 \
                   -v /var/lib/apps-data/registry:/tmp/registry-dev \
                   registry:2.1.1
