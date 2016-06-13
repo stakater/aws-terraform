@@ -4,7 +4,7 @@ coreos:
   etcd2:
     # generate a new token for each unique cluster from https://discovery.etcd.io/new?size=3
     # specify the initial size of your cluster with ?size=X
-    discovery: https://discovery.etcd.io/02b7ec99d61155b93c4ff7cd5b308552
+    discovery: https://discovery.etcd.io/4f3252be9b8f0e54b00465a6ce8730c5
     # multi-region and multi-cloud deployments need to use $public_ipv4
     #advertise-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
     #initial-advertise-peer-urls: http://127.0.0.1:2380
@@ -184,22 +184,45 @@ coreos:
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
-    - name: registry.service
+    - name: gen-certificate.service
       comand: start
       content: |
         [Unit]
-        Description=Docker Image Registry v2
+        Description= Service for generating certificates for docker registry
         Requires=docker.service
         After=docker.service
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=300
-        ExecStartPre=/usr/bin/docker pull registry:2.1.1
+        ExecStartPre=/usr/bin/docker pull paulczar/omgwtfssl
         ExecStartPre=-/usr/bin/docker rm -f %n
-        ExecStartPre=/bin/bash -c "if[ ! -d /var/lib/apps-data/registry]; then mkdir /var/lib/apps-data/registry fi"
-        ExecStart=/usr/bin/docker run --rm --name %n -p 5000:5000 \
-                  -v /var/lib/apps-data/registry:/tmp/registry-dev \
-                  registry:2.1.1
+        ExecStartPre=-/bin/mkdir -p /opt/registry/data
+        ExecStartPre=-/bin/mkdir -p /opt/registry/ssl
+        ExecStartPre=-/bin/mkdir -p /opt/registry/config
+        ExecStart=/usr/bin/docker run --rm --name %n \
+                  -v /opt/registry/ssl:/certs \
+                  -e CA_SUBJECT=registry.local \
+                  -e SSL_DNS=registry.local \
+                  paulczar/omgwtfssl
+    - name: registry.service
+      comand: start
+      content: |
+        [Unit]
+        Description=Docker Image Registry
+        Requires=docker.service
+        After=docker.service
+        After=gen-certificate.service
+        [Service]
+        EnvironmentFile=/etc/environment
+        TimeoutStartSec=300
+        ExecStartPre=/usr/bin/docker pull registry:2
+        ExecStartPre=-/usr/bin/docker rm -f %n
+        ExecStart=/usr/bin/docker run  --rm --name %n -p 5000:5000 \
+                  -v /opt/registry:/opt/registry \
+                  -e REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/opt/registry/data \
+                  -e REGISTRY_HTTP_TLS_KEY=/opt/registry/ssl/key.pem \
+                  -e REGISTRY_HTTP_TLS_CERTIFICATE=/opt/registry/ssl/cert.pem \
+                  -e REGISTRY_HTTP_TLS_CLIENTCAS_0=/opt/registry/ssl/ca.pem \
+                  registry:2
         RestartSec=5
         Restart=always
-
