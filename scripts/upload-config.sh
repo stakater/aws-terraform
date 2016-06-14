@@ -1,4 +1,7 @@
 #!/bin/sh -e
+####################################################################
+## This script uploads passed file, or folder to the `config` Bucket
+####################################################################
 
 AWS_PROFILE=${AWS_PROFILE}
 CLUSTER_NAME=${CLUSTER_NAME}
@@ -14,13 +17,19 @@ BUCKET_URL="s3://${AWS_ACCOUNT}-${CONFIG_BUCKET}"
 AWS_ROLE=$1
 
 # TODO: this should be able to accept any array of config files!
-# A config file to upload
-CONFIG_FILE=$2
+# A resource (file or folder) to upload
+UPLOAD_RESOURCE=$2
 
 # Extract the file name
-fname=`basename $CONFIG_FILE`
+fname=`basename $UPLOAD_RESOURCE`
 
 echo $AWS_ROLE
-echo $CONFIG_FILE
+echo $UPLOAD_RESOURCE
 
-aws --profile ${AWS_PROFILE} s3 cp ${CONFIG_FILE} ${BUCKET_URL}/${AWS_ROLE}/${fname}
+# If resource to upload is a file
+if [ -f $UPLOAD_RESOURCE ]
+then aws --profile ${AWS_PROFILE} s3 cp ${UPLOAD_RESOURCE} ${BUCKET_URL}/${AWS_ROLE}/${fname}
+# else if resource to upload is a folder
+elif [ -d $UPLOAD_RESOURCE ]
+then aws --profile ${AWS_PROFILE} s3 cp --recursive ${UPLOAD_RESOURCE} ${BUCKET_URL}/${AWS_ROLE}/${fname}
+fi
