@@ -43,6 +43,7 @@ CONFIG := $(BUILD)/cloud-config
 CERTS := $(BUILD)/certs
 SITE_CERT := $(CERTS)/site.pem
 POLICIES := $(BUILD)/policies
+RESOURCE_SCRIPTS := $(BUILD)/scripts # scripts that are to be uploaded on coreos as a resource and run their
 MODULE_VARS=$(BUILD)/module_vars.tf
 VPC_MODULE=$(MODULES)/vpc
 
