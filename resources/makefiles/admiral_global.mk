@@ -36,6 +36,6 @@ upload_admiral_global_userdata: init_build_dir
 		# uploads confing folder to config s3 bucket; by keeping the folder structure
 
 upload_admiral_global_configs:
-	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_admiral_global $(RESOURCE_SCRIPTS)/upload-certificates.sh
+	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_admiral_global $(RESOURCE_SCRIPTS)/upload-files.sh
 
 .PHONY: admiral_global destroy_admiral_global refresh_admiral_global plan_admiral_global init_admiral_global clean_admiral_global upload_admiral_global_configs upload_admiral_global_userdata admiral_global_ips

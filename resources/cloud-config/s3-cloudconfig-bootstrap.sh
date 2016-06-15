@@ -99,7 +99,7 @@ curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
   https://${configBucket}.s3.amazonaws.com/${logstashConfigFile}
 
 #######################################################################
-# Download `upload-certificates.sh` from admiral_global to /etc/scripts
+# Download `upload-files.sh` from admiral_global to /etc/scripts
 #
 # Downloading this script will allow gen-certificate.service to generate
 # certificates then upload them to s3
@@ -109,7 +109,7 @@ scriptsDir="/etc/scripts"
 mkdir -m 700 -p ${scriptsDir}
 cd ${scriptsDir}
 
-uploadScriptFile="CLUSTER-NAME_admiral_global/upload-certificates.sh"
+uploadScriptFile="CLUSTER-NAME_admiral_global/upload-files.sh"
 
 resource="/${configBucket}/${uploadScriptFile}"
 create_string_to_sign
@@ -124,7 +124,7 @@ curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
   https://${configBucket}.s3.amazonaws.com/${uploadScriptFile}
 
 # make script file executable
-chmod a+x upload-certificates.sh
+chmod a+x upload-files.sh
 
 ########################################################################
 # Download CLUSTER-NAME-cloudinit/<profile>/clould-config.yaml

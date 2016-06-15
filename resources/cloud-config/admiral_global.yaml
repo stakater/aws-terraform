@@ -206,7 +206,7 @@ coreos:
                   -e CA_SUBJECT=registry.local \
                   -e SSL_DNS=registry.local \
                   paulczar/omgwtfssl
-        ExecStop=/usr/bin/sh -c "/etc/scripts/upload-certificates.sh /opt/registry/ssl registry_certificates"
+        ExecStop=/usr/bin/sh -c "/etc/scripts/upload-files.sh /opt/registry/ssl registry_certificates"
     - name: registry.service
       command: start
       content: |
