@@ -1,3 +1,15 @@
+# If number of command line arguments supplied is less than 2
+if [ "$#" -lt 2 ]; then
+    echo "Illegal number of arguments"
+		echo "Usage: $(basename $0) <path to dir from which the files are to be uploaded> <destination path in s3 config bucket>"
+		exit 0
+fi
+
+if [ ! -d $1 ]; then
+  echo "First argument must be a directory"
+  exit 0
+fi
+
 # Get instance auth token from meta-data
 get_value() {
   echo -n $(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$roleProfile/ \
@@ -31,21 +43,20 @@ accountId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/docu
         | grep -Eo '([[:digit:]]{12})')
 
 # Bucket path to upload certificates to
-configBucket=${accountId}-coreos-cluster-config
+configBucket=${accountId}-CLUSTER-NAME-config
 
 # Find token, AccessKeyId,  line, remove leading space, quote, commas
 s3Token=$(get_value "Token")
 s3Key=$(get_value "AccessKeyId")
 s3Secret=$(get_value "SecretAccessKey")
 
-certificates_location="/opt/registry/ssl"
+source_location=$1
 
-for file in ${certificates_location}/*
+for file in ${source_location}/*
 do
   fileName=${file##*/}
   echo "Uploading ${fileName} ..."
-  registry_certificates="${roleProfile}/registry_certificates/${fileName}"
-
+  registry_certificates="${roleProfile}/$2/${fileName}"
   resource="/${configBucket}/${registry_certificates}"
   create_string_to_sign
   signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
