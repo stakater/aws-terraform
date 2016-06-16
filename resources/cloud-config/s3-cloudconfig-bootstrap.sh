@@ -114,7 +114,6 @@ uploadScriptFile="CLUSTER-NAME_admiral_global/upload-files.sh"
 resource="/${configBucket}/${uploadScriptFile}"
 create_string_to_sign
 signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
-filePath=${uploadScriptFile}
 debug_log
 curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
   -H "Content-Type: ${contentType}" \
@@ -125,6 +124,40 @@ curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
 
 # make script file executable
 chmod a+x upload-files.sh
+
+#######################################################################
+# Download registry certificate from admiral_global if it exists
+#
+#######################################################################
+
+regCertDir="/etc/registry_certificates"
+mkdir -m 700 -p ${regCertDir}
+cd ${regCertDir}
+
+regCertFile="CLUSTER-NAME_admiral_global/registry_certificates/ca.pem"
+
+resource="/${configBucket}/${regCertFile}"
+create_string_to_sign
+signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
+debug_log
+curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
+  -H "Content-Type: ${contentType}" \
+  -H "Authorization: AWS ${s3Key}:${signature}" \
+  -H "x-amz-security-token:${s3Token}" \
+  -H "Date: ${dateValue}" \
+  https://${configBucket}.s3.amazonaws.com/${regCertFile}
+
+# if ca.pem file is downloaded and is a valid certificate copy to docker registry certificate location
+# else delete the downloaded files
+if [ -f ${regCertDir}/ca.pem ] && grep -q "BEGIN CERTIFICATE" ${regCertDir}/ca.pem ;
+then
+  dockerCertDir="/etc/docker/certs.d/registry.local:5000/"
+  mkdir -p ${dockerCertDir}
+  #NOTE: copy the ca.pem file as ca.crt
+  cp ${regCertDir}/ca.pem ${dockerCertDir}/ca.crt
+else
+  rm -f ${regCertFile}/*
+fi
 
 ########################################################################
 # Download CLUSTER-NAME-cloudinit/<profile>/clould-config.yaml
