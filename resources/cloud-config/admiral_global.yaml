@@ -4,12 +4,7 @@ coreos:
   etcd2:
     # generate a new token for each unique cluster from https://discovery.etcd.io/new?size=3
     # specify the initial size of your cluster with ?size=X
-    discovery: https://discovery.etcd.io/4f3252be9b8f0e54b00465a6ce8730c5
-    # multi-region and multi-cloud deployments need to use $public_ipv4
-    #advertise-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
-    #initial-advertise-peer-urls: http://127.0.0.1:2380
-    # listen on both the official ports and the legacy ports
-    # legacy ports can be omitted if your application doesn't depend on them
+    discovery: https://discovery.etcd.io/06b904a07860d6f3ba7f513458ccfd31
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
     #listen-peer-urls: http://0.0.0.0:2380,http://0.0.0.0:7001
   fleet:
@@ -76,116 +71,117 @@ coreos:
         Description=Reboot timer
         [Timer]
         OnCalendar=*-*-* 05,06:00/30:00
-    - name: gocd-server.service
-      command: start
-      content: |
-        [Unit]
-        Description=gocd server
-        After=docker.service
-        Requires=docker.service
-        [Service]
-        EnvironmentFile=/etc/environment
-        TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-server:16.2.1
-        ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -p 8153:8153 -e AGENT_KEY=123456789abcdef -e AGENT_KEY=123456789zxcvb -e AGENT_KEY=123456789mnbvcx -e AGENT_KEY=123456789lkjhgf -e AGENT_KEY=123456789ytrewq gocd/gocd-server:16.2.1"
-        ExecStop=/usr/bin/docker stop %n
-        RestartSec=10
-        Restart=always
-    - name: gocd-agent-ci-base.service
-      command: start
-      content: |
-        [Unit]
-        Description=gocd agent # 1 for continuous integration base docker images
-        After=docker.service
-        Requires=docker.service
-        After=gocd-server.service
-        Requires=gocd-server.service
-        [Service]
-        EnvironmentFile=/etc/environment
-        TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
-        ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789abcdef --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
-        ExecStop=-/usr/bin/docker stop %n
-        RestartSec=10
-        Restart=always
-    - name: gocd-agent-ci-app.service
-      command: start
-      content: |
-        [Unit]
-        Description=gocd agent # 2 for continuous integration of app docker images
-        After=docker.service
-        Requires=docker.service
-        After=gocd-server.service
-        Requires=gocd-server.service
-
-        [Service]
-        EnvironmentFile=/etc/environment
-        TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
-        ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789zxcvb --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
-        ExecStop=-/usr/bin/docker stop %n
-        RestartSec=10
-        Restart=always
-    - name: gocd-agent-cd-dev.service
-      command: start
-      content: |
-        [Unit]
-        Description=gocd agent # 3 for continuous deployment to DEV environment
-        After=docker.service
-        Requires=docker.service
-        After=gocd-server.service
-        Requires=gocd-server.service
-
-        [Service]
-        EnvironmentFile=/etc/environment
-        TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
-        ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789mnbvcx --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
-        ExecStop=-/usr/bin/docker stop %n
-        RestartSec=10
-        Restart=always
-    - name: gocd-agent-cd-test.service
-      command: start
-      content: |
-        [Unit]
-        Description=gocd agent # 4 for continuous deployment to TEST environment
-        After=docker.service
-        Requires=docker.service
-        After=gocd-server.service
-        Requires=gocd-server.service
-
-        [Service]
-        EnvironmentFile=/etc/environment
-        TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
-        ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789lkjhgf --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
-        ExecStop=-/usr/bin/docker stop %n
-        RestartSec=10
-        Restart=always
-    - name: gocd-agent-cd-prod.service
-      command: start
-      content: |
-        [Unit]
-        Description=gocd agent # 5 for continuous deployment to PROD environment
-        After=docker.service
-        Requires=docker.service
-        After=gocd-server.service
-        Requires=gocd-server.service
-
-        [Service]
-        EnvironmentFile=/etc/environment
-        TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
-        ExecStartPre=-/usr/bin/docker rm %n
-        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789ytrewq --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
-        ExecStop=-/usr/bin/docker stop %n
-        RestartSec=10
-        Restart=always
+#    - name: gocd-server.service
+#      command: start
+#      content: |
+#        [Unit]
+#        Description=gocd server
+#        After=docker.service
+#        Requires=docker.service
+#        [Service]
+#        EnvironmentFile=/etc/environment
+#        TimeoutStartSec=0
+#        ExecStartPre=/usr/bin/docker pull gocd/gocd-server:16.2.1
+#        ExecStartPre=-/usr/bin/docker rm %n
+#        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -p 8153:8153 -e AGENT_KEY=123456789abcdef -e AGENT_KEY=123456789zxcvb -e AGENT_KEY=123456789mnbvcx -e AGENT_KEY=123456789lkjhgf -e AGENT_KEY=123456789ytrewq gocd/gocd-server:16.2.1"
+#        ExecStop=/usr/bin/docker stop %n
+#        RestartSec=10
+#        Restart=always
+#    - name: gocd-agent-ci-base.service
+#      command: start
+#      content: |
+#        [Unit]
+#        Description=gocd agent # 1 for continuous integration base docker images
+#        After=docker.service
+#        Requires=docker.service
+#        After=gocd-server.service
+#        Requires=gocd-server.service
+#        [Service]
+#        EnvironmentFile=/etc/environment
+#        TimeoutStartSec=0
+#        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+#        ExecStartPre=-/usr/bin/docker rm %n
+#        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789abcdef --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+#        ExecStop=-/usr/bin/docker stop %n
+#        RestartSec=10
+#        Restart=always
+#    - name: gocd-agent-ci-app.service
+#      command: start
+#      content: |
+#        [Unit]
+#        Description=gocd agent # 2 for continuous integration of app docker images
+#        After=docker.service
+#        Requires=docker.service
+#        After=gocd-server.service
+#        Requires=gocd-server.service
+#
+#        [Service]
+#        EnvironmentFile=/etc/environment
+#        TimeoutStartSec=0
+#        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+#        ExecStartPre=-/usr/bin/docker rm %n
+#        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789zxcvb --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+#        ExecStop=-/usr/bin/docker stop %n
+#        RestartSec=10
+#        Restart=always
+#    - name: gocd-agent-cd-dev.service
+#      command: start
+#      content: |
+#        [Unit]
+#        Description=gocd agent # 3 for continuous deployment to DEV environment
+#        After=docker.service
+#        Requires=docker.service
+#        After=gocd-server.service
+#        Requires=gocd-server.service
+#
+#        [Service]
+#        EnvironmentFile=/etc/environment
+#        TimeoutStartSec=0
+#        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+#        ExecStartPre=-/usr/bin/docker rm %n
+#        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789mnbvcx --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+#        ExecStop=-/usr/bin/docker stop %n
+#        RestartSec=10
+#        Restart=always
+#    - name: gocd-agent-cd-test.service
+#      command: start
+#      content: |
+#        [Unit]
+#        Description=gocd agent # 4 for continuous deployment to TEST environment
+#        After=docker.service
+#        Requires=docker.service
+#        After=gocd-server.service
+#        Requires=gocd-server.service
+#
+#        [Service]
+#        EnvironmentFile=/etc/environment
+#        TimeoutStartSec=0
+#        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+#        ExecStartPre=-/usr/bin/docker rm %n
+#        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789lkjhgf --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+#        ExecStop=-/usr/bin/docker stop %n
+#        RestartSec=10
+#        Restart=always
+#    - name: gocd-agent-cd-prod.service
+#      command: start
+#      content: |
+#        [Unit]
+#        Description=gocd agent # 5 for continuous deployment to PROD environment
+#        After=docker.service
+#        Requires=docker.service
+#        After=gocd-server.service
+#        Requires=gocd-server.service
+#
+#        [Service]
+#        EnvironmentFile=/etc/environment
+#        TimeoutStartSec=0
+#        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
+#        ExecStartPre=-/usr/bin/docker rm %n
+#        ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789ytrewq --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
+#        ExecStop=-/usr/bin/docker stop %n
+#        RestartSec=10
+#        Restart=always
+    # NOTE: cluster name placeholder will be replaced by the cluster name at runtime
     - name: gen-certificate.service
       command: start
       content: |
@@ -203,8 +199,8 @@ coreos:
         ExecStartPre=-/bin/mkdir -p /opt/registry/config
         ExecStart=/usr/bin/docker run --rm --name %n \
                   -v /opt/registry/ssl:/certs \
-                  -e CA_SUBJECT=registry.local \
-                  -e SSL_DNS=registry.local \
+                  -e CA_SUBJECT=registry.CLUSTER-NAME.local \
+                  -e SSL_DNS=registry.CLUSTER-NAME.local \
                   paulczar/omgwtfssl
         ExecStop=/usr/bin/sh -c "/etc/scripts/upload-files.sh /opt/registry/ssl registry_certificates"
     - name: registry.service

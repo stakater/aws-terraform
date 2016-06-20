@@ -1,4 +1,6 @@
-admiral_global: etcd plan_admiral_global upload_admiral_global_configs upload_admiral_global_userdata
+admiral_global: pre_admiral_global route53 base_instance
+
+pre_admiral_global: etcd plan_admiral_global upload_admiral_global_configs upload_admiral_global_userdata
 	cd $(BUILD); \
 		$(SCRIPTS)/aws-keypair.sh -c admiral_global; \
 		$(TF_APPLY) -target module.admiral_global
@@ -38,4 +40,4 @@ upload_admiral_global_userdata: init_build_dir
 upload_admiral_global_configs:
 	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_admiral_global $(RESOURCE_SCRIPTS)/upload-files.sh
 
-.PHONY: admiral_global destroy_admiral_global refresh_admiral_global plan_admiral_global init_admiral_global clean_admiral_global upload_admiral_global_configs upload_admiral_global_userdata admiral_global_ips
+.PHONY: admiral_global pre_admiral_global destroy_admiral_global refresh_admiral_global plan_admiral_global init_admiral_global clean_admiral_global upload_admiral_global_configs upload_admiral_global_userdata admiral_global_ips
