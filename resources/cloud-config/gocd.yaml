@@ -82,7 +82,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull $gocd/gocd-agent:16.2.1
+        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.2.1
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n -e AGENT_KEY=123456789zxcvb --link gocd-server.service:go-server gocd/gocd-agent:16.2.1"
         ExecStop=-/usr/bin/docker stop %n
