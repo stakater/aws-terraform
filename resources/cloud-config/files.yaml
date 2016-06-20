@@ -1,12 +1,12 @@
-write_files:            
+write_files:
   - path: /opt/bin/git-sync.sh
     permissions: 0700
     owner: root
     content: |
         #!/bin/bash
         # This script sync /var/lib/apps with github repo
-        if [[ -d /var/lib/apps ]]; 
-        then 
+        if [[ -d /var/lib/apps ]];
+        then
             cd /var/lib/apps; git pull
         else
             make -p /var/lib
@@ -25,7 +25,7 @@ write_files:
         APPBUCKET=s3://${AWS_ACCOUNT}-CLUSTER-NAME-config/apps
         DST=/var/lib/apps
         CMD="aws s3 sync --exact-timestamps --delete $APPBUCKET $DST && chmod 755 ${DST}/bin/*"
-        
+
         # pull the IMAGE if not loaded
         docker history $IMAGE > /dev/null 2>&1 || docker pull $IMAGE
         # sync s3 apps to
@@ -35,7 +35,7 @@ write_files:
     owner: root
     content: |
         #!/usr/bin/bash
-        # This script gets excecuted on each reboot. 
+        # This script gets excecuted on each reboot.
         # It can be an additional config you want to set after CoreOS's cloud-config.
         post_provision='/var/lib/apps/post_provision'
         # wait until the post_provision is downloaded from git/s3
@@ -58,7 +58,7 @@ write_files:
         rebootflag='NEED_REBOOT'
         hostip=$(hostname -i | tr -d ' ')
         ismember=$(etcdctl member list |grep -Eo "(http://$hostip:2380)")
-        
+
         if update_engine_client -status | grep $rebootflag;
         then
             echo -n "etcd2 is "
@@ -73,8 +73,3 @@ write_files:
             fi
         fi
         exit 0
-  - path: /etc/systemd/system/docker.service.d/50-insecure-registry.conf
-    content: |
-        [Service]
-        Environment=DOCKER_OPTS='--insecure-registry=10.0.0.0/8,dockerhub.CLUSTER-NAME.local'
-
