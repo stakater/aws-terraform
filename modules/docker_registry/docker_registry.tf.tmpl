@@ -2,12 +2,12 @@
 # Admiral Global autoscale group configurations
 #
 
-resource "aws_instance" "admiral_global" {
+resource "aws_instance" "docker_registry" {
   # use system generated name to allow changes of launch_configuration
   # name = "workder-${var.ami}"
   ami = "${var.ami}"
   instance_type = "${var.image_type}"
-  iam_instance_profile = "${aws_iam_instance_profile.admiral_global.name}"
+  iam_instance_profile = "${aws_iam_instance_profile.docker_registry.name}"
 
   availability_zone =<%MODULE-AZ-VARIABLE%>
   subnet_id =  <%MODULE-SUBNET-VARIABLE%>
@@ -25,7 +25,7 @@ resource "aws_instance" "admiral_global" {
   }
 
   key_name = "${var.keypair}"
-  security_groups = ["${aws_security_group.admiral_global.id}"]
+  security_groups = ["${aws_security_group.docker_registry.id}"]
   lifecycle { create_before_destroy = true }
 
   # /opt/data
@@ -36,29 +36,29 @@ resource "aws_instance" "admiral_global" {
   }
 
   tags {
-        Name = "admiral_global"
+        Name = "docker_registry"
   }
 
   user_data = "${file("cloud-config/s3-cloudconfig-bootstrap.sh")}"
 }
 
-resource "aws_iam_instance_profile" "admiral_global" {
-    name = "${var.cluster_name}_admiral_global"
-    roles = ["${aws_iam_role.admiral_global.name}"]
+resource "aws_iam_instance_profile" "docker_registry" {
+    name = "${var.cluster_name}_docker_registry"
+    roles = ["${aws_iam_role.docker_registry.name}"]
 }
 
-resource "aws_iam_role_policy" "admiral_global_policy" {
-    name = "${var.cluster_name}_admiral_global"
-    role = "${aws_iam_role.admiral_global.id}"
-    policy = "${file(\"policies/admiral_global_policy.json\")}"
+resource "aws_iam_role_policy" "docker_registry_policy" {
+    name = "${var.cluster_name}_docker_registry"
+    role = "${aws_iam_role.docker_registry.id}"
+    policy = "${file(\"policies/docker_registry_policy.json\")}"
 }
 
-resource "aws_iam_role" "admiral_global" {
-    name = "${var.cluster_name}_admiral_global"
+resource "aws_iam_role" "docker_registry" {
+    name = "${var.cluster_name}_docker_registry"
     path = "/"
     assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
 }
 
-output "admiral_global_private_ip" {
-    value = "${aws_instance.admiral_global.private_ip}"
+output "docker_registry_private_ip" {
+    value = "${aws_instance.docker_registry.private_ip}"
 }

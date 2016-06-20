@@ -17,7 +17,7 @@ PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
-VPC_SUBNET_MODULES=etcd,admiral,admiral_global,worker,elb,rds,base_instance
+VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,base_instance
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account
@@ -82,7 +82,7 @@ destroy:
 
 destroy_all: \
 	destroy_admiral \
-	destroy_admiral_global \
+	destroy_docker_registry \
 	destroy_dockerhub \
 	destroy_gocd \
 	destroy_elk \

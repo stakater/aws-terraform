@@ -22,6 +22,10 @@ resource "aws_instance" "base_instance" {
   subnet_id =  <%BASEINSTANCE-SUBNET-VARIABLE%>
   security_groups = ["${aws_security_group.base_instance.id}"]
 
+  tags {
+        Name = "base_instance"
+  }
+
   user_data = "${file("cloud-config/s3-cloudconfig-bootstrap.sh")}"
 }
 

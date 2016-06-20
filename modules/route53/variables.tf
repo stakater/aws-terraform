@@ -1,4 +1,3 @@
 variable "vpc_id" { }
-#variable "public_domain" { default="dockerage.com" }
 variable "private_domain" { }
-variable "admiral_global_private_ip" { }
+variable "docker_registry_private_ip" { }

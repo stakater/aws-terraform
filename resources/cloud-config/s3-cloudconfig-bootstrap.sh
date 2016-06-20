@@ -99,7 +99,7 @@ curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
   https://${configBucket}.s3.amazonaws.com/${logstashConfigFile}
 
 #######################################################################
-# Download `upload-files.sh` from admiral_global to /etc/scripts
+# Download `upload-files.sh` from docker_registry to /etc/scripts
 #
 # Downloading this script will allow gen-certificate.service to generate
 # certificates then upload them to s3
@@ -109,7 +109,7 @@ scriptsDir="/etc/scripts"
 mkdir -m 700 -p ${scriptsDir}
 cd ${scriptsDir}
 
-uploadScriptFile="CLUSTER-NAME_admiral_global/upload-files.sh"
+uploadScriptFile="CLUSTER-NAME_docker_registry/upload-files.sh"
 
 resource="/${configBucket}/${uploadScriptFile}"
 create_string_to_sign
@@ -126,7 +126,7 @@ curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
 chmod a+x upload-files.sh
 
 #######################################################################
-# Download registry certificate from admiral_global if it exists
+# Download registry certificate from docker_registry if it exists
 #
 #######################################################################
 
@@ -134,7 +134,7 @@ regCertDir="/etc/registry_certificates"
 mkdir -m 700 -p ${regCertDir}
 cd ${regCertDir}
 
-regCertFile="CLUSTER-NAME_admiral_global/registry_certificates/ca.pem"
+regCertFile="CLUSTER-NAME_docker_registry/registry_certificates/ca.pem"
 
 resource="/${configBucket}/${regCertFile}"
 create_string_to_sign

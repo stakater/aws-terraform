@@ -9,7 +9,7 @@ coreos:
     #listen-peer-urls: http://0.0.0.0:2380,http://0.0.0.0:7001
   fleet:
     public-ip: $private_ipv4
-    metadata: "env=CLUSTER-NAME,platform=ec2,provider=aws,role=admiral_global"
+    metadata: "env=CLUSTER-NAME,platform=ec2,provider=aws,role=docker_registry"
   update:
     reboot-strategy: off
   units:

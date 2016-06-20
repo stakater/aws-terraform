@@ -1,7 +1,7 @@
-resource "aws_security_group" "admiral_global"  {
-    name = "admiral_global"
+resource "aws_security_group" "docker_registry"  {
+    name = "docker_registry"
     vpc_id = "${var.vpc_id}"
-    description = "admiral_global"
+    description = "docker_registry"
 
     # Allow all outbound traffic
     egress {
@@ -37,6 +37,6 @@ resource "aws_security_group" "admiral_global"  {
     }
 
     tags {
-      Name = "admiral_global"
+      Name = "docker_registry"
     }
 }
