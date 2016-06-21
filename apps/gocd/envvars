@@ -1,6 +1,7 @@
 # See https://github.com/gocd/gocd-docker
-GOCD_IMAGE=gocd/gocd-server:16.1.0
-GOCD_OPTS="-p 8153:8153 -e AGENT_KEY=123456789abcdef"
+GOCD_IMAGE=gocd/gocd-server:16.2.1
+GOCD_OPTS="-p 8153:8153 -e AGENT_KEY=123456789abcdef -e AGENT_KEY=123456789zxcvb -e AGENT_KEY=123456789mnbvcx -e AGENT_KEY=123456789lkjhgf -e AGENT_KEY=123456789ytrewq"
+
 #    -v /var/lib/apps-data/gocd/etc:/etc/go \
 #    -v /var/lib/apps-data/gocd/go-server:/var/lib/go-server \
 #    -v /var/lib/apps-data/gocd/log/go-server:/var/log/go-server"
@@ -8,8 +9,13 @@ GOCD_OPTS="-p 8153:8153 -e AGENT_KEY=123456789abcdef"
 # Note: for gocd-agent:16.1.0
 # -e GO_SERVER=gocd.docker.local is NOT working for auto registration
 # MUST have --link gocd.service:go-server
-GOCD_AGENT_IMAGE=gocd/gocd-agent:16.1.0
-#GOCD_AGENT_OPTS="-e AGENT_KEY=123456789abcdef -e GO_SERVER=gocd.docker.local"
-GOCD_AGENT_OPTS="-e AGENT_KEY=123456789abcdef --link gocd.service:go-server"
+
+GOCD_AGENT_IMAGE=gocd/gocd-agent:16.2.1
+GOCD_AGENT_CI_BASE_OPTS="-e AGENT_KEY=123456789abcdef --link gocd.service:go-server"
+GOCD_AGENT_CI_APP_OPTS="-e AGENT_KEY=123456789zxcvb --link gocd.service:go-server"
+GOCD_AGENT_CD_DEV_OPTS="-e AGENT_KEY=123456789mnbvcx --link gocd.service:go-server"
+GOCD_AGENT_CD_TEST_OPTS="-e AGENT_KEY=123456789lkjhgf --link gocd.service:go-server"
+GOCD_AGENT_CD_PROD_OPTS="-e AGENT_KEY=123456789ytrewq --link gocd.service:go-server"
+
 #    -v /var/lib/apps-data/gocd/etc:/etc/go \
 #    -v /var/lib/apps-data/gocd/log/go-agent:/var/log/go-agent"

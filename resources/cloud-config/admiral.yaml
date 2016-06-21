@@ -1,8 +1,8 @@
 #cloud-config
 
-coreos: 
+coreos:
   etcd2:
-    proxy: on
+    discovery: https://discovery.etcd.io/59b91eba6a0705e55ff470943ee5c14a
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
   fleet:
     public-ip: $private_ipv4
@@ -12,11 +12,6 @@ coreos:
   units:
     - name: etcd2.service
       command: start
-      drop-ins:
-        - name: 60-initial-cluster.conf
-          content: |
-            [Service]
-            EnvironmentFile=/etc/sysconfig/initial-cluster
     - name: fleet.service
       command: reload-or-restart
     - name: docker-tcp.socket
@@ -25,13 +20,13 @@ coreos:
       content: |
           [Unit]
           Description=Docker Socket for the API
-          
+
           [Socket]
           ListenStream=2375
           Service=docker.service
           BindIPv6Only=both
-          
-          [Install] 
+
+          [Install]
           WantedBy=sockets.target
     - name: format-opt-data.service
       command: start
@@ -43,7 +38,7 @@ coreos:
         RemainAfterExit=yes
         Environment="LABEL=opt-data"
         Environment="DEV=/dev/xvdc"
-        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then  wipefs -a -f $DEV && mkfs.ext4 -F -L $LABEL $DEV && echo wiped; fi" 
+        ExecStart=-/bin/bash -c "if ! findfs LABEL=$LABEL > /tmp/label.$LABEL; then  wipefs -a -f $DEV && mkfs.ext4 -F -L $LABEL $DEV && echo wiped; fi"
     - name: opt-data.mount
       command: start
       content: |
@@ -70,4 +65,3 @@ coreos:
         Description=Reboot timer
         [Timer]
         OnCalendar=*-*-* 05,06:00/30:00
-

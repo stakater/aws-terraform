@@ -61,7 +61,10 @@ bucket=${accountId}-CLUSTER-NAME-cloudinit
 cloudConfigYaml="${roleProfile}/cloud-config.yaml"
 
 # path to initial-cluster urls file
-initialCluster="CLUSTER-NAME_etcd/initial-cluster"
+# initial-cluster file will be in `etcd` folder instead of `CLUSTER-NAME_etcd` folder
+# as it is put in this folder by [dockerage/etcd-aws-cluster](https://hub.docker.com/r/dockerage/etcd-aws-cluster/) image
+# For more information refer to Tehcnical notes section in the project's README.md
+initialCluster="etcd/initial-cluster"
 
 # Find token, AccessKeyId,  line, remove leading space, quote, commas
 s3Token=$(get_value "Token")

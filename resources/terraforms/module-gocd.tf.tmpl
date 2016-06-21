@@ -1,7 +1,7 @@
 module "gocd" {
     source = "../modules/gocd"
 
-    image_type = "t2.micro"
+    image_type = "t2.medium"
     cluster_desired_capacity = 1
     root_volume_size =  8
     docker_volume_size =  12
@@ -15,7 +15,7 @@ module "gocd" {
 
     #cluster name
     cluster_name = "${var.cluster_name}"
-    
+
     # vpc
     vpc_id = "${module.vpc.vpc_id}"
     vpc_cidr = "${module.vpc.vpc_cidr}"
