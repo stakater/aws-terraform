@@ -1,0 +1,20 @@
+[Unit]
+Description=Docker Image Registry
+Requires=docker.service
+After=docker.service
+After=gen-certificate.service
+
+[Service]
+EnvironmentFile=/etc/environment
+TimeoutStartSec=300
+ExecStartPre=/usr/bin/docker pull registry:2
+ExecStartPre=-/usr/bin/docker rm -f %n
+ExecStart=/usr/bin/docker run  --rm --name %n -p 5000:5000 \
+          -v /opt/registry:/opt/registry \
+          -e REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/opt/registry/data \
+          -e REGISTRY_HTTP_TLS_KEY=/opt/registry/ssl/key.pem \
+          -e REGISTRY_HTTP_TLS_CERTIFICATE=/opt/registry/ssl/cert.pem \
+          -e REGISTRY_HTTP_TLS_CLIENTCAS_0=/opt/registry/ssl/ca.pem \
+          registry:2
+RestartSec=5
+Restart=always

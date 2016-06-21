@@ -1,0 +1,21 @@
+[Unit]
+Description= Service for generating certificates for docker registry
+Requires=docker.service
+After=docker.service
+[Service]
+EnvironmentFile=/etc/environment
+TimeoutStartSec=300
+ExecStartPre=/usr/bin/docker pull paulczar/omgwtfssl
+ExecStartPre=-/usr/bin/docker rm -f %n
+ExecStartPre=-/bin/mkdir -p /opt/registry/data
+ExecStartPre=-/bin/mkdir -p /opt/registry/ssl
+ExecStartPre=-/bin/mkdir -p /opt/registry/config
+
+#NOTE: Please make sure your DNS values are correct (If your dns has cluster-name appended, please append it) 
+ExecStart=/usr/bin/docker run --rm --name %n \
+          -v /opt/registry/ssl:/certs \
+          -e CA_SUBJECT=registry.local \
+          -e SSL_DNS=registry.local \
+          paulczar/omgwtfssl
+RestartSec=5
+Restart=always

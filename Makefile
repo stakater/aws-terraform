@@ -17,7 +17,7 @@ PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
-VPC_SUBNET_MODULES=etcd,admiral,worker,elb,rds,base_instance
+VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,base_instance
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account
@@ -43,6 +43,8 @@ CONFIG := $(BUILD)/cloud-config
 CERTS := $(BUILD)/certs
 SITE_CERT := $(CERTS)/site.pem
 POLICIES := $(BUILD)/policies
+# scripts that are to be uploaded on coreos as a resource and run their
+RESOURCE_SCRIPTS := $(BUILD)/scripts
 MODULE_VARS=$(BUILD)/module_vars.tf
 VPC_MODULE=$(MODULES)/vpc
 
@@ -80,6 +82,7 @@ destroy:
 
 destroy_all: \
 	destroy_admiral \
+	destroy_docker_registry \
 	destroy_dockerhub \
 	destroy_gocd \
 	destroy_elk \
