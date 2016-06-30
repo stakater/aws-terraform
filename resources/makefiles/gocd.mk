@@ -1,4 +1,4 @@
-gocd: etcd plan_gocd upload_gocd_userdata
+gocd: etcd plan_gocd upload_gocd_configs upload_gocd_userdata
 	cd $(BUILD); \
 		$(SCRIPTS)/aws-keypair.sh -c gocd; \
 		$(TF_APPLY) -target module.gocd
@@ -34,5 +34,9 @@ upload_gocd_userdata: init_build_dir
 	cd $(BUILD); \
 		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_gocd $(CONFIG)/cloudinit-gocd.def
 
-.PHONY: gocd destroy_gocd refresh_gocd plan_gocd init_gocd
+# uploads confing folder to config s3 bucket; by keeping the folder structure
+upload_gocd_configs:
+	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_gocd $(MODULES)/gocd/conf/
+
+.PHONY: gocd destroy_gocd refresh_gocd plan_gocd init_gocd upload_gocd_configs
 .PHONY: clean_gocd upload_gocd_userdata gocd_ips
