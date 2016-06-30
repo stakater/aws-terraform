@@ -43,7 +43,7 @@ do
     esac
 done
 
-if !$mOptionFlag || ! $iOptionFlag || ! $oOptionFlag || ! $cOptionFlag;
+if ! $mOptionFlag || ! $iOptionFlag || ! $oOptionFlag || ! $cOptionFlag;
 then
   echo "Usage: $(basename $0) -m <Makefile location> -i <Base App Docker Image> -o <Docker Options> -c <Cluster Name>"
   exit 0;
