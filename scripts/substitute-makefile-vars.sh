@@ -50,7 +50,9 @@ then
 fi
 
 # substitue whole line where string 'BASE_APP_DOCKER_IMG' appears
-makeFile="../Makefile"
-sed -i "/BASE_APP_DOCKER_IMG/c\BASE_APP_DOCKER_IMG := \\${DOCKER_IMAGE}" $MAKEFILE
-sed -i "/BASE_APP_DOCKER_OPTS/c\BASE_APP_DOCKER_OPTS := \\${DOCKER_OPTS}" $MAKEFILE
-sed -i "/CLUSTER_NAME/c\CLUSTER_NAME := \\${CLUSTER_NAME}" $MAKEFILE
+echo "Substituting Docker Image value: ${DOCKER_IMAGE}..."
+sed -i "/BASE_APP_DOCKER_IMG := /c\BASE_APP_DOCKER_IMG := \\${DOCKER_IMAGE}" $MAKEFILE
+echo "Substituting Docker Options value: ${DOCKER_OPTS}..."
+sed -i "/BASE_APP_DOCKER_OPTS := /c\BASE_APP_DOCKER_OPTS := \\${DOCKER_OPTS}" $MAKEFILE
+echo "Substituting Cluster name value: ${CLUSTER_NAME}..."
+sed -i "/CLUSTER_NAME := /c\CLUSTER_NAME := \\${CLUSTER_NAME}" $MAKEFILE
