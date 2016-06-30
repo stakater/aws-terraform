@@ -48,7 +48,8 @@ coreos:
         ExecStartPre=/usr/bin/docker pull gocd/gocd-server:16.5.0-3305
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
-                                  -p 8153:8153 -e AGENT_KEY=123456789abcdef \
+                                  -p 8153:8153 \
+                                  -e AGENT_KEY=123456789abcdef \
                                   -e AGENT_KEY=123456789zxcvb \
                                   -e AGENT_KEY=123456789mnbvcx \
                                   -e AGENT_KEY=123456789lkjhgf \
