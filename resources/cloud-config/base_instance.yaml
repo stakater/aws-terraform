@@ -11,6 +11,7 @@ coreos:
     # legacy ports can be omitted if your application doesn't depend on them
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
     listen-peer-urls: http://0.0.0.0:2380,http://0.0.0.0:7001
+
   update:
     reboot-strategy: off
   units:
@@ -19,19 +20,19 @@ coreos:
       # TODO: Add drop-ins here, environment file of initial cluster
     - name: fleet.service
       command: start
-    - name: hello.service
+    - name: application.service
       command: start
       content: |
         [Unit]
-        Description=hello_docker
+        Description= Application
         After=docker.service
         Requires=docker.service
         [Service]
         TimeoutStartSec=0
-        ExecStartPre=-/usr/bin/docker rm busybox1
-        ExecStartPre=/usr/bin/docker pull busybox
-        ExecStart=/usr/bin/docker run --rm --name busybox1 busybox /bin/sh -c "while true; do echo Hello Docker; sleep 1; done"
-        ExecStop=/usr/bin/docker stop busybox1
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStartPre=/usr/bin/docker pull <#DOCKER_IMAGE#>
+        ExecStart=/usr/bin/docker run --rm --name %n <#DOCKER_OPTS#> <#DOCKER_IMAGE#>
+        ExecStop=/usr/bin/docker stop %n
         RestartSec=1
         Restart=always
         [Install]

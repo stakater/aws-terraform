@@ -30,6 +30,7 @@ init_build_dir:
 	@cp -rf $(RESOURCES)/scripts $(BUILD)
 	@$(SCRIPTS)/substitute-AWS-ACCOUNT.sh $(POLICIES)/*.json
 	@$(SCRIPTS)/substitute-CLUSTER-NAME.sh $(CONFIG)/*.yaml $(POLICIES)/*.json $(CONFIG)/s3-cloudconfig-bootstrap.sh $(RESOURCE_SCRIPTS)/*.sh
+	@$(SCRIPTS)/substitute-app-docker-vars.sh $(CONFIG)/base_instance.yaml
 	@$(SCRIPTS)/substitute-VPC-AZ-placeholders.sh $(MODULES) $(TF_RESOURCES)/*.tf.tmpl
 	@$(SCRIPTS)/substitute-AZ-placeholder.sh $(MODULES)
 
