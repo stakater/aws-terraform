@@ -17,7 +17,7 @@ PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 
 # Base application variables
 BASE_APP_DOCKER_IMG := busybox
-BASE_APP_DOCKER_OPTS :=
+BASE_APP_DOCKER_OPTS=''
 
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
