@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-# Replace DOCKER_IMAGE and DOCKER_OPTS with user defined values.
-
+# Replace DOCKER_IMAGE and DOCKER_OPTS with
+# values from environment variables
 DOCKER_IMAGE=${APP_DOCKER_IMAGE}
 DOCKER_OPTS=${APP_DOCKER_OPTS}
 
-echo "$DOCKER_IMAGE";
-echo "$DOCKER_OPTS";
+#TODO: ChECK IF ENV VARIABLES EMPTY, EXIT WITH ERROR MESSAGE
 
 files=$(grep -s -l -e \<#DOCKER_IMAGE#\> -e \<#DOCKER_OPTS#\> -r $@)
 if [ "X$files" != "X" ];
