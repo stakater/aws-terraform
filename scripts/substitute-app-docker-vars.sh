@@ -6,7 +6,7 @@ DOCKER_IMAGE=${APP_DOCKER_IMAGE//////}
 DOCKER_OPTS=${APP_DOCKER_OPTS}
 
 echo "$DOCKER_IMAGE"
-echo "$DOCKER_OPTS"
+echo "\"$DOCKER_OPTS\""
 
 files=$(grep -s -l -e \<#DOCKER_IMAGE#\>  -e \<#DOCKER_OPTS#\> -r $@)
 if [ "X$files" != "X" ];
