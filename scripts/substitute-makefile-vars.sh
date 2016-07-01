@@ -5,54 +5,37 @@
 # replace variables in the make file with the
 # values from the GoCD Job.
 ##############################################
-
-DOCKER_IMAGE=""
-DOCKER_OPTS=""
 CLUSTER_NAME=""
 MAKEFILE=""
 
 # Flags to make sure all options are given
 mOptionFlag=false;
-iOptionFlag=false;
-oOptionFlag=false;
 cOptionFlag=false;
 # Get options from the command line
-while getopts ":m:i:o:c:" OPTION
+while getopts ":m:c:" OPTION
 do
     case $OPTION in
         m)
           mOptionFlag=true
           MAKEFILE=$OPTARG
           ;;
-        i)
-          iOptionFlag=true
-          DOCKER_IMAGE=$OPTARG
-          ;;
-        o)
-          oOptionFlag=true
-          DOCKER_OPTS=$OPTARG
-          ;;
         c)
           cOptionFlag=true
           CLUSTER_NAME=$OPTARG
           ;;
         *)
-          echo "Usage: $(basename $0) -m <Makefile location> -i <Base App Docker Image> -o <Docker Options> -c <Cluster Name>"
+          echo "Usage: $(basename $0) -m <Makefile location> -c <Cluster Name>"
           exit 0
           ;;
     esac
 done
 
-if ! $mOptionFlag || ! $iOptionFlag || ! $oOptionFlag || ! $cOptionFlag;
+if ! $mOptionFlag || ! $cOptionFlag;
 then
-  echo "Usage: $(basename $0) -m <Makefile location> -i <Base App Docker Image> -o <Docker Options> -c <Cluster Name>"
+  echo "Usage: $(basename $0) -m <Makefile location>  -c <Cluster Name>"
   exit 0;
 fi
 
-# substitue whole line where string 'BASE_APP_DOCKER_IMG' appears
-echo "Substituting Docker Image value: ${DOCKER_IMAGE}..."
-sed -i "/BASE_APP_DOCKER_IMG :=/c\BASE_APP_DOCKER_IMG := \\${DOCKER_IMAGE}" $MAKEFILE
-echo "Substituting Docker Options value: ${DOCKER_OPTS}..."
-sed -i "/BASE_APP_DOCKER_OPTS=/c\BASE_APP_DOCKER_OPTS=\\${DOCKER_OPTS}" $MAKEFILE
+# substitue whole line where string 'CLUSTER_NAME :=' appears
 echo "Substituting Cluster name value: ${CLUSTER_NAME}..."
 sed -i "/CLUSTER_NAME :=/c\CLUSTER_NAME := \\${CLUSTER_NAME}" $MAKEFILE
