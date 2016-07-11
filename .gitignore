@@ -5,6 +5,8 @@
 
 modules/admiral/admiral.tf
 modules/admiral/variables.tf
+modules/aurora_db/aurora_db.tf
+modules/aurora_db/variables.tf
 modules/docker_registry/docker_registry.tf
 modules/docker_registry/variables.tf
 modules/base_instance/base_instance.tf

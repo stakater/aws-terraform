@@ -1,0 +1,23 @@
+variable "environment_name" {
+    description = "The name of the environment"
+}
+
+variable "vpc_id" {
+  description = "The ID of the VPC that the RDS cluster will be created in"
+}
+
+variable "aurora_db_name" {
+  description = "Name of the Database"
+}
+
+variable "aurora_db_username" {
+  description = "The ID's of the VPC subnets that the RDS cluster instances will be created in"
+}
+
+variable "aurora_db_password" {
+  description = "The ID's of the VPC subnets that the RDS cluster instances will be created in"
+}
+
+# This placeholder will be replaced by module subnet id and availability zone tf variable definations
+# For more information look into 'substitute-VPC-AZ-placeholders.sh'
+<%MODULE-SUBNET-VARIABLES%>
