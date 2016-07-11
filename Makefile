@@ -15,13 +15,9 @@ VM_TYPE=hvm
 # For route53.tf
 PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 
-# Base application variables
-BASE_APP_DOCKER_IMG := busybox
-BASE_APP_DOCKER_OPTS=''
-
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
-VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,base_instance
+VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,base_instance,aurora_db
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account

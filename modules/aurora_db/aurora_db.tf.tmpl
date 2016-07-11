@@ -1,0 +1,88 @@
+########################
+## Cluster
+########################
+
+resource "aws_rds_cluster" "aurora_cluster" {
+
+    cluster_identifier            = "${var.environment_name}-aurora-cluster"
+    availability_zones            = <%MODULE-AZ-VARIABLES-ARRAY%>
+    database_name                 = "${var.aurora_db_name}"
+    master_username               = "${var.aurora_db_username}"
+    master_password               = "${var.aurora_db_password}"
+    #backup_retention_period       = 14
+    #preferred_backup_window       = "02:00-03:00"
+    #preferred_maintenance_window  = "wed:03:00-wed:04:00"
+    db_subnet_group_name          = "${aws_db_subnet_group.aurora_subnet_group.name}"
+    final_snapshot_identifier     = "${var.environment_name}-aurora-cluster"
+    vpc_security_group_ids        = [
+        "${aws_security_group.aurora_db.id}"
+    ]
+
+#    tags {
+#        Name         = "${var.environment_name}-Aurora-DB-Cluster"
+#        ManagedBy    = "terraform"
+#        Environment  = "${var.environment_name}"
+#    }
+
+    lifecycle {
+        create_before_destroy = true
+    }
+
+}
+
+resource "aws_rds_cluster_instance" "aurora_cluster_instance" {
+
+    count                 = "1"
+
+    identifier            = "${var.environment_name}-aurora-instance-${count.index}"
+    cluster_identifier    = "${aws_rds_cluster.aurora_cluster.id}"
+    instance_class        = "db.t2.small"
+    db_subnet_group_name  = "${aws_db_subnet_group.aurora_subnet_group.name}"
+    publicly_accessible   = true
+
+    tags {
+        Name         = "${var.environment_name}-Aurora-DB-Instance-${count.index}"
+        ManagedBy    = "terraform"
+        Environment  = "${var.environment_name}"
+    }
+
+    lifecycle {
+        create_before_destroy = true
+    }
+
+}
+
+resource "aws_db_subnet_group" "aurora_subnet_group" {
+
+    name          = "${var.environment_name}_aurora_db_subnet_group"
+    description   = "Allowed subnets for Aurora DB cluster instances"
+    subnet_ids    = <%MODULE-ID-VARIABLES-ARRAY%>
+
+    tags {
+        Name         = "${var.environment_name}-Aurora-DB-Subnet-Group"
+        ManagedBy    = "terraform"
+        Environment  = "${var.environment_name}"
+    }
+
+}
+
+########################
+## Route53 Record
+########################
+#TODO: Add route53 record for aurora_db address !?
+
+#resource "aws_route53_record" "aurora_db_record" {
+#  zone_id = "${aws_route53_zone.private.zone_id}"
+#  name = "{var.environment_name}_db"
+#  type = "A"
+#  ttl = "5"
+#  records = ["${aws_rds_cluster.aurora_cluster.address}"]
+#}
+
+########################
+## Output
+########################
+
+output "aurora_db_address" {
+    value = "${aws_rds_cluster.aurora_cluster.address}"
+}
