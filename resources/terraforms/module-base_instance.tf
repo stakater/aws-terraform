@@ -28,4 +28,5 @@ module "base_instance" {
     vpc_id = "${var.env_vpc_id}"
     vpc_cidr = "${var.env_vpc_cidr}"
     subnet_id = "${var.env_subnet_id}"
+    availability_zone = "${var.env_avail_zone}"
 }
