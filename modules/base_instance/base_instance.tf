@@ -2,7 +2,7 @@
 resource "aws_instance" "base_instance" {
   count = 1
   ami   = "${var.ami}"
-  availability_zone =<%BASEINSTANCE-AZ-VARIABLE%>
+  availability_zone = "${var.availability_zone}"
   instance_type = "${var.image_type}"
   iam_instance_profile = "${aws_iam_instance_profile.base_instance.name}"
 
