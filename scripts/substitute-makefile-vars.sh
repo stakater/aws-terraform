@@ -38,4 +38,4 @@ fi
 
 # substitue whole line where string 'CLUSTER_NAME :=' appears
 echo "Substituting Cluster name value: ${CLUSTER_NAME}..."
-sed -i "/CLUSTER_NAME :=/c\CLUSTER_NAME := \\${CLUSTER_NAME}" $MAKEFILE
+sed -i "/CLUSTER_NAME :=/c\CLUSTER_NAME := ${CLUSTER_NAME}" $MAKEFILE
