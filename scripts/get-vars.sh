@@ -39,5 +39,6 @@ variable "ami" { default = "`curl -s $url`" }
 variable "private_domain" { default = "${PRIVATE_DOMAIN}"}
 variable "env_vpc_id" { default = "${ENV_VPC_ID}"}
 variable "env_vpc_cidr" { default = "${ENV_VPC_CIDR}"}
+variable "subnet_id" { default = "${ENV_SUBNET_ID}"}
 EOF
-# Expose vpc id and cidr from environment variables
+# Expose vpc id & cidr and subnet id from environment variables
