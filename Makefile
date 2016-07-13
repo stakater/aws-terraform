@@ -82,6 +82,7 @@ destroy:
 	@echo "Node: destroy may fail because of outstanding dependences"
 
 destroy_all: \
+	destroy_global_env \
 	destroy_admiral \
 	destroy_docker_registry \
 	destroy_dockerhub \

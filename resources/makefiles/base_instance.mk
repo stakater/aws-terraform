@@ -1,12 +1,12 @@
 #base_instance: vpc s3 iam plan_base_instance upload_base_instance_userdata
-base_instance: plan_base_instance upload_base_instance_userdata
+base_instance: iam plan_base_instance upload_base_instance_userdata
 	cd $(BUILD); \
 		$(SCRIPTS)/aws-keypair.sh -c base_instance; \
 		$(TF_APPLY) -target module.base_instance
 	@$(MAKE) base_instance_ips
 
 #plan_base_instance: plan_vpc plan_s3 plan_iam init_base_instance
-plan_base_instance: init_base_instance
+plan_base_instance: plan_iam init_base_instance
 	cd $(BUILD); \
 		$(TF_PLAN) -target module.base_instance;
 
