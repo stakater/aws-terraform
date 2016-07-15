@@ -41,5 +41,7 @@ variable "env_vpc_id" { default = "${ENV_VPC_ID}"}
 variable "env_vpc_cidr" { default = "${ENV_VPC_CIDR}"}
 variable "env_subnet_id" { default = "${ENV_SUBNET_ID}"}
 variable "env_avail_zone" { default = "${ENV_AVAIL_ZONE}"}
+variable "env_app_name" { default = "${ENV_APP_NAME}"}
+variable "env_app_version" { default = "${ENV_APP_VERSION}"}
 EOF
-# Expose vpc id & cidr and subnet id from environment variables
+# Expose vpc id & cidr, subnet id, availability zone and app name & version from environment variables

@@ -4,7 +4,6 @@ module "base_instance" {
     # base_instance cluster_desired_capacity should be in odd numbers, e.g. 3, 5, 9
     cluster_desired_capacity = 1
     image_type = "t2.medium"
-    keypair = "base_instance"
     allow_ssh_cidr="0.0.0.0/0"
 
     # aws
@@ -24,9 +23,11 @@ module "base_instance" {
     #vpc_id = "${module.vpc.vpc_id}"
     #vpc_cidr = "${module.vpc.vpc_cidr}"
 
-    # vpc from env var
+    # Setting values from env vars
     vpc_id = "${var.env_vpc_id}"
     vpc_cidr = "${var.env_vpc_cidr}"
     subnet_id = "${var.env_subnet_id}"
     availability_zone = "${var.env_avail_zone}"
+    application_name = "${var.env_app_name}"
+    application_version = "${var.env_app_version}"
 }

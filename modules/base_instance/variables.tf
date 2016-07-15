@@ -17,3 +17,5 @@ variable "vpc_id" { }
 variable "vpc_cidr" { }
 variable "subnet_id" { }
 variable "availability_zone" { }
+variable "application_name" { }
+variable "application_version" { }

@@ -1,5 +1,5 @@
 resource "aws_ami_from_instance" "ami_baker" {
-    name = "${var.cluster_name}_ami"
+    name = "${var.cluster_name}_${var.application_name}_${var.application_version}"
     source_instance_id = "${var.instance_id}"
 }
 
