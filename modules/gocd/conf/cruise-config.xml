@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="81">
   <server artifactsdir="artifacts" agentAutoRegisterKey="123456789ytrewq" commandRepositoryLocation="default" serverId="e89d0b81-9c38-4e25-a946-ac1dc6944233" />
-  <pipelines group="Stakater-Pipelines">
-    <pipeline name="Stakater-Pipeline">
+  <pipelines group="QBX">
+    <pipeline name="QBX" template="Stakater_Template">
       <params>
         <param name="SOURCE_DIR" />
         <param name="BUILD_DOCKER_IMAGE"></param>
@@ -15,30 +15,31 @@
         <param name="APP_TEST_ARTIFACT"></param>
         <param name="APP_IMAGE_BUILD_DIR"></param>
         <param name="APP_IMAGE_BUILD_VERSION_CMD"></param>
-        <param name="STAKATER_COMMAND">make init_build_dir</param>
-        <param name="STAKATER_CLUSTER_NAME">gocd-cluster</param>
-        <param name="AWS_REGION">sa-east-1</param>
+        <param name="APP_NAME">MyApplication</param>
+        <param name="APP_DOCKER_IMAGE"></param>
+        <param name="APP_DOCKER_OPTS"></param>
+        <param name="STAKATER_LOCATION">/app/stakater_${GO_PIPELINE_NAME}</param>
+        <param name="STAKATER_COMMAND">make ami_baker</param>
+        <param name="STAKATER_CLUSTER_NAME">coreos-cluster</param>
+        <param name="STAKATER_IAM_USER_NAME">gocd_${GO_PIPELINE_NAME}</param>
+        <param name="AWS_REGION">us-west-2</param>
         <param name="AWS_ACCESS_KEY_ID"></param>
         <param name="AWS_SECRET_KEY"></param>
       </params>
-      <environmentvariables>
-        <variable name="APP_DOCKER_IMAGE">
-          <value></value>
-        </variable>
-        <variable name="APP_DOCKER_OPTS">
-          <value></value>
-        </variable>
-      </environmentvariables>
       <materials>
         <git url="" branch="master" />
       </materials>
+    </pipeline>
+  </pipelines>
+  <templates>
+    <pipeline name="Stakater_Template">
       <stage name="Compile">
         <jobs>
           <job name="Compile">
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker run -d --name #{BUILD_DOCKER_IMAGE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
+                <arg>pwd;sudo docker run -d --name #{BUILD_DOCKER_IMAGE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
                 <runif status="any" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
@@ -105,23 +106,23 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker build -t ${APP_DOCKER_IMAGE} #{APP_IMAGE_BUILD_DIR}</arg>
+                <arg>sudo docker build -t #{APP_DOCKER_IMAGE} #{APP_IMAGE_BUILD_DIR}</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker push ${APP_DOCKER_IMAGE}</arg>
+                <arg>sudo docker push #{APP_DOCKER_IMAGE}</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>newTag=${APP_DOCKER_IMAGE}:$(bash -c "#{APP_IMAGE_BUILD_VERSION_CMD}").$GO_PIPELINE_COUNTER;\
-                     sudo docker tag -f ${APP_DOCKER_IMAGE} ${newTag}</arg>
+                <arg>newTag=#{APP_DOCKER_IMAGE}:$(bash -c "#{APP_IMAGE_BUILD_VERSION_CMD}").$GO_PIPELINE_COUNTER;\
+                     sudo docker tag -f #{APP_DOCKER_IMAGE} ${newTag}</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>newTag=${APP_DOCKER_IMAGE}:$(bash -c "#{APP_IMAGE_BUILD_VERSION_CMD}").$GO_PIPELINE_COUNTER;\
+                <arg>newTag=#{APP_DOCKER_IMAGE}:$(bash -c "#{APP_IMAGE_BUILD_VERSION_CMD}").$GO_PIPELINE_COUNTER;\
                      sudo docker push ${newTag}</arg>
                 <runif status="passed" />
               </exec>
@@ -136,25 +137,25 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>echo $HOME;if [ ! -d $HOME/.aws ]; then mkdir ~/.aws;
+                <arg>if [ -d $HOME/.aws ]; then rm -rf $HOME/.aws; fi; mkdir ~/.aws;
                        echo -e "[profile coreos-cluster] \nregion = #{AWS_REGION} \n[default] \nregion = #{AWS_REGION}" &gt; $HOME/.aws/config;
-                       echo -e "[coreos-cluster] \naws_access_key_id = #{AWS_ACCESS_KEY_ID}\naws_secret_access_key = #{AWS_SECRET_KEY}\n[default]\naws_access_key_id = #{AWS_ACCESS_KEY_ID}\naws_secret_access_key = #{AWS_SECRET_KEY}" &gt; $HOME/.aws/credentials; fi</arg>
+                       echo -e "[coreos-cluster] \naws_access_key_id = #{AWS_ACCESS_KEY_ID}\naws_secret_access_key = #{AWS_SECRET_KEY}\n[default]\naws_access_key_id = #{AWS_ACCESS_KEY_ID}\naws_secret_access_key = #{AWS_SECRET_KEY}" &gt; $HOME/.aws/credentials;</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>appDir=(/app/*); \
-                    if [ ${##appDir[@]} == 0 ]; then sudo git clone https://github.com/stakater/stakater.git /app; fi</arg>
+                <arg>if [ ! -d "#{STAKATER_LOCATION}" ]; then sudo mkdir -p #{STAKATER_LOCATION};fi;  \
+                    if [ ! "$(ls -A #{STAKATER_LOCATION})" ]; then sudo git clone https://github.com/stakater/stakater.git #{STAKATER_LOCATION}; fi</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>cd /app; sudo git pull origin master; sudo git fetch;sudo git checkout gocd-units;sudo git checkout -f; sudo git pull origin gocd-units;</arg>
+                <arg>cd #{STAKATER_LOCATION};sudo git pull origin master; sudo git fetch;sudo git checkout gocd-units;sudo git checkout -f; sudo git pull origin gocd-units;</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker run -d --name terraform -v /app:/usr/src/app stakater/terraform</arg>
+                <arg>sudo docker run -d --name terraform -v #{STAKATER_LOCATION}:/usr/src/app stakater/terraform</arg>
                 <runif status="any" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
@@ -164,12 +165,31 @@
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo /app/scripts/substitute-makefile-vars.sh -m /app/Makefile -c ${STAKATER_CLUSTER_NAME};</arg>
+                <arg>sudo #{STAKATER_LOCATION}/scripts/substitute-makefile-vars.sh -m #{STAKATER_LOCATION}/Makefile -c #{STAKATER_CLUSTER_NAME};</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker exec terraform /bin/bash -c "export APP_DOCKER_IMAGE=${APP_DOCKER_IMAGE};export APP_DOCKER_OPTS=\"${APP_DOCKER_OPTS}\";#{STAKATER_COMMAND}"</arg>
+                <arg>sudo #{STAKATER_LOCATION}/scripts/substitute-iam-deployment-user-name.sh -f #{STAKATER_LOCATION}/resources/terraforms/module-iam.tf -d #{STAKATER_IAM_USER_NAME};</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>macAddress=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/);
+                     vpc_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/vpc-id);
+                     vpc_cidr=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/vpc-ipv4-cidr-block);
+                     subnet_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/subnet-id);
+                     avail_zone=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone/);
+                     app_version=$(bash -c "#{APP_IMAGE_BUILD_VERSION_CMD}").$GO_PIPELINE_COUNTER;
+                     sudo docker exec terraform /bin/bash -c "export ENV_VPC_ID=${vpc_id}; \
+                                                              export ENV_VPC_CIDR=\"${vpc_cidr}\"; \
+                                                              export ENV_SUBNET_ID=${subnet_id}; \
+                                                              export ENV_AVAIL_ZONE=${avail_zone}; \
+                                                              export ENV_APP_NAME=#{APP_NAME}; \
+                                                              export ENV_APP_VERSION=${app_version}; \
+                                                              export APP_DOCKER_IMAGE=#{APP_DOCKER_IMAGE}; \
+                                                              export APP_DOCKER_OPTS=\"#{APP_DOCKER_OPTS}\"; \
+                                                              #{STAKATER_COMMAND};"</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
@@ -182,7 +202,7 @@
         </jobs>
       </stage>
     </pipeline>
-  </pipelines>
+  </templates>
   <agents>
   </agents>
 </cruise>
