@@ -30,7 +30,7 @@ init_base_instance: init
 
 upload_base_instance_userdata: init_build_dir
 	cd $(BUILD); \
-		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_${ENV_APP_NAME}_role $(CONFIG)/cloudinit-base_instance.def
+		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_${ENV_APP_NAME} $(CONFIG)/cloudinit-base_instance.def
 
 base_instance_ips:
 	@echo "base_instance public ips: " `$(SCRIPTS)/get-ec2-public-id.sh base_instance`

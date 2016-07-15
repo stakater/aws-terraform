@@ -44,7 +44,7 @@ resource "aws_iam_role_policy" "base_instance_policy" {
 }
 
 resource "aws_iam_role" "base_instance" {
-    name = "${var.cluster_name}_${var.application_name}_role"
+    name = "${var.cluster_name}_${var.application_name}"
     path = "/"
     assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
 }
