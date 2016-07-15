@@ -1,6 +1,6 @@
 /* The AWS Security Group specifies the inbound (ingress) and outbound (egress) networking rules */
 resource "aws_security_group" "base_instance" {
-  name   = "base_instance"
+  name   = "${var.application_name}_security_group"
   vpc_id = "${var.vpc_id}"
   description = "base_instance"
 
@@ -19,6 +19,6 @@ resource "aws_security_group" "base_instance" {
   }
 
   tags {
-      Name = "base_instance"
+      Name = "${var.application_name}_security_group"
   }
 }
