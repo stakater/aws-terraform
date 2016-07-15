@@ -1,7 +1,7 @@
 #base_instance: vpc s3 iam plan_base_instance upload_base_instance_userdata
 base_instance: iam plan_base_instance upload_base_instance_userdata
 	cd $(BUILD); \
-		$(SCRIPTS)/aws-keypair.sh -c base_instance; \
+		$(SCRIPTS)/aws-keypair.sh -c ${ENV_APP_NAME}_key; \
 		$(TF_APPLY) -target module.base_instance
 	@$(MAKE) base_instance_ips
 
@@ -17,7 +17,7 @@ refresh_base_instance: | $(TF_PORVIDER)
 
 destroy_base_instance: | $(TF_PORVIDER)
 	cd $(BUILD); \
-	  $(SCRIPTS)/aws-keypair.sh -d base_instance; \
+	  $(SCRIPTS)/aws-keypair.sh -d ${ENV_APP_NAME}_key; \
 		$(TF_DESTROY) -target module.base_instance.aws_instance.base_instance; \
 		$(TF_DESTROY) -target module.base_instance
 
@@ -30,7 +30,7 @@ init_base_instance: init
 
 upload_base_instance_userdata: init_build_dir
 	cd $(BUILD); \
-		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_base_instance $(CONFIG)/cloudinit-base_instance.def
+		$(SCRIPTS)/gen-userdata.sh ${CLUSTER_NAME}_${ENV_APP_NAME}_role $(CONFIG)/cloudinit-base_instance.def
 
 base_instance_ips:
 	@echo "base_instance public ips: " `$(SCRIPTS)/get-ec2-public-id.sh base_instance`
