@@ -31,7 +31,7 @@ resource "aws_instance" "base_instance" {
 
 # setup the base_instance ec2 profile, role and polices
 resource "aws_iam_instance_profile" "base_instance" {
-    name = "${var.cluster_name}_${var.application_name}_profile"
+    name = "${var.cluster_name}_${var.application_name}"
     roles = ["${aws_iam_role.base_instance.name}"]
     depends_on = [ "aws_iam_role.base_instance" ]
 }
