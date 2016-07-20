@@ -4,7 +4,8 @@ base_instance: iam plan_base_instance upload_base_instance_userdata
 		$(SCRIPTS)/aws-keypair.sh -c ${ENV_APP_NAME}_key; \
 		$(TF_APPLY) -target module.base_instance
 	@$(MAKE) base_instance_ips
-	sleep 30;
+	sleep 60; # To add pause before ami creation so that base instace is set up
+	# TODO: add mechanism to verify if base instance is set up instead of sleep
 
 #plan_base_instance: plan_vpc plan_s3 plan_iam init_base_instance
 plan_base_instance: plan_iam init_base_instance
