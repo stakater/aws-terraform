@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="81">
   <server artifactsdir="artifacts" agentAutoRegisterKey="123456789ytrewq" commandRepositoryLocation="default" serverId="e89d0b81-9c38-4e25-a946-ac1dc6944233" />
-  <pipelines group="QBX">
-    <pipeline name="QBX" template="Stakater_Template">
+  <pipelines group="MyApp">
+    <pipeline name="MyApp" template="Stakater_Template">
       <params>
         <param name="SOURCE_DIR" />
         <param name="BUILD_DOCKER_IMAGE"></param>
@@ -12,17 +12,16 @@
         <param name="APP_COMPILE_CMD"></param>
         <param name="APP_TEST_CMD"></param>
         <param name="APP_PACKAGE_CMD"></param>
-        <param name="APP_TEST_ARTIFACT"></param>
+        <param name="APP_TEST_ARTIFACT">/</param>
         <param name="APP_IMAGE_BUILD_DIR"></param>
-        <param name="APP_IMAGE_BUILD_VERSION_CMD"></param>
+        <param name="APP_IMAGE_BUILD_VERSION">${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER}</param>
         <param name="APP_NAME">MyApplication</param>
         <param name="APP_DOCKER_IMAGE"></param>
         <param name="APP_DOCKER_OPTS"></param>
         <param name="STAKATER_LOCATION">/app/stakater_${GO_PIPELINE_NAME}</param>
-        <param name="STAKATER_COMMAND">make ami_baker</param>
+        <param name="STAKATER_COMMAND">make ami_baker;make destroy_base_instance;</param>
         <param name="STAKATER_CLUSTER_NAME">coreos-cluster</param>
         <param name="STAKATER_IAM_USER_NAME">gocd_${GO_PIPELINE_NAME}</param>
-        <param name="AWS_REGION">us-west-2</param>
         <param name="AWS_ACCESS_KEY_ID"></param>
         <param name="AWS_SECRET_KEY"></param>
       </params>
@@ -39,7 +38,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>pwd;sudo docker run -d --name #{BUILD_DOCKER_IMAGE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
+                <arg>sudo docker run -d --name #{BUILD_DOCKER_IMAGE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
                 <runif status="any" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
@@ -116,13 +115,13 @@
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>newTag=#{APP_DOCKER_IMAGE}:$(bash -c "#{APP_IMAGE_BUILD_VERSION_CMD}").$GO_PIPELINE_COUNTER;\
+                <arg>newTag=#{APP_DOCKER_IMAGE}:#{APP_IMAGE_BUILD_VERSION};\
                      sudo docker tag -f #{APP_DOCKER_IMAGE} ${newTag}</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>newTag=#{APP_DOCKER_IMAGE}:$(bash -c "#{APP_IMAGE_BUILD_VERSION_CMD}").$GO_PIPELINE_COUNTER;\
+                <arg>newTag=#{APP_DOCKER_IMAGE}:#{APP_IMAGE_BUILD_VERSION};\
                      sudo docker push ${newTag}</arg>
                 <runif status="passed" />
               </exec>
@@ -137,8 +136,9 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>if [ -d $HOME/.aws ]; then rm -rf $HOME/.aws; fi; mkdir ~/.aws;
-                       echo -e "[profile coreos-cluster] \nregion = #{AWS_REGION} \n[default] \nregion = #{AWS_REGION}" &gt; $HOME/.aws/config;
+                <arg>aws_region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
+                     if [ -d $HOME/.aws ]; then rm -rf $HOME/.aws; fi; mkdir ~/.aws;
+                       echo -e "[profile coreos-cluster] \nregion = ${aws_region} \n[default] \nregion = ${aws_region}" &gt; $HOME/.aws/config;
                        echo -e "[coreos-cluster] \naws_access_key_id = #{AWS_ACCESS_KEY_ID}\naws_secret_access_key = #{AWS_SECRET_KEY}\n[default]\naws_access_key_id = #{AWS_ACCESS_KEY_ID}\naws_secret_access_key = #{AWS_SECRET_KEY}" &gt; $HOME/.aws/credentials;</arg>
                 <runif status="passed" />
               </exec>
@@ -155,12 +155,12 @@
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker run -d --name terraform -v #{STAKATER_LOCATION}:/usr/src/app stakater/terraform</arg>
+                <arg>sudo docker run -d --name terraform_${GO_PIPELINE_NAME} -v #{STAKATER_LOCATION}:/usr/src/app stakater/terraform</arg>
                 <runif status="any" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker cp $HOME/.aws terraform:/root/.aws</arg>
+                <arg>sudo docker cp $HOME/.aws terraform_${GO_PIPELINE_NAME}:/root/.aws</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
@@ -180,21 +180,20 @@
                      vpc_cidr=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/vpc-ipv4-cidr-block);
                      subnet_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/subnet-id);
                      avail_zone=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone/);
-                     app_version=$(bash -c "#{APP_IMAGE_BUILD_VERSION_CMD}").$GO_PIPELINE_COUNTER;
-                     sudo docker exec terraform /bin/bash -c "export ENV_VPC_ID=${vpc_id}; \
+                     sudo docker exec terraform_${GO_PIPELINE_NAME} /bin/bash -c "export ENV_VPC_ID=${vpc_id}; \
                                                               export ENV_VPC_CIDR=\"${vpc_cidr}\"; \
                                                               export ENV_SUBNET_ID=${subnet_id}; \
                                                               export ENV_AVAIL_ZONE=${avail_zone}; \
                                                               export ENV_APP_NAME=#{APP_NAME}; \
-                                                              export ENV_APP_VERSION=${app_version}; \
+                                                              export ENV_APP_VERSION=#{APP_IMAGE_BUILD_VERSION}; \
                                                               export APP_DOCKER_IMAGE=#{APP_DOCKER_IMAGE}; \
                                                               export APP_DOCKER_OPTS=\"#{APP_DOCKER_OPTS}\"; \
-                                                              #{STAKATER_COMMAND};"</arg>
+                                                              #{STAKATER_COMMAND}"</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker rm -vf terraform</arg>
+                <arg>sudo docker rm -vf terraform_${GO_PIPELINE_NAME}</arg>
                 <runif status="any" />
               </exec>
             </tasks>
