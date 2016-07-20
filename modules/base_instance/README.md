@@ -1,7 +1,7 @@
 This module creates a base instance for the application, from which an AMI will be created.
 
 # Prerequisites:
-This module requires the following global variables to be defined:
+This module requires the following Environment variables to be defined:
 
 ```
 ENV_VPC_ID: ID of the VPC in which the instance is to be created
