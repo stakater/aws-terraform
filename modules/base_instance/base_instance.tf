@@ -1,8 +1,8 @@
-/* VPN Server -> Creating an EC2 instance on AWS */
+/* Base instance of the application from which the AMI is to be created */
 resource "aws_instance" "base_instance" {
   count = 1
   ami   = "${var.ami}"
-  availability_zone =<%BASEINSTANCE-AZ-VARIABLE%>
+  availability_zone = "${var.availability_zone}"
   instance_type = "${var.image_type}"
   iam_instance_profile = "${aws_iam_instance_profile.base_instance.name}"
 
@@ -18,12 +18,12 @@ resource "aws_instance" "base_instance" {
     volume_size = "${var.docker_volume_size}"
   }
 
-  key_name      = "${var.keypair}"
-  subnet_id =  <%BASEINSTANCE-SUBNET-VARIABLE%>
+  key_name      = "${var.application_name}_key"
+  subnet_id =  "${var.subnet_id}"
   security_groups = ["${aws_security_group.base_instance.id}"]
 
   tags {
-        Name = "base_instance"
+        Name = "${var.application_name}_${var.application_version}"
   }
 
   user_data = "${file("cloud-config/s3-cloudconfig-bootstrap.sh")}"
@@ -31,20 +31,20 @@ resource "aws_instance" "base_instance" {
 
 # setup the base_instance ec2 profile, role and polices
 resource "aws_iam_instance_profile" "base_instance" {
-    name = "${var.cluster_name}_base_instance"
+    name = "${var.cluster_name}_${var.application_name}"
     roles = ["${aws_iam_role.base_instance.name}"]
     depends_on = [ "aws_iam_role.base_instance" ]
 }
 
 resource "aws_iam_role_policy" "base_instance_policy" {
-    name = "${var.cluster_name}_base_instance_policy"
+    name = "${var.cluster_name}_${var.application_name}_policy"
     role = "${aws_iam_role.base_instance.id}"
     policy = "${file(\"policies/base_instance_policy.json\")}"
     depends_on = [ "aws_iam_role.base_instance" ]
 }
 
 resource "aws_iam_role" "base_instance" {
-    name = "${var.cluster_name}_base_instance"
+    name = "${var.cluster_name}_${var.application_name}"
     path = "/"
     assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
 }

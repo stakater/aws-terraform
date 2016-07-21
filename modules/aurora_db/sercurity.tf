@@ -1,8 +1,8 @@
 /* The AWS Security Group specifies the inbound (ingress) and outbound (egress) networking rules */
-resource "aws_security_group" "base_instance" {
-  name   = "${var.application_name}_security_group"
+resource "aws_security_group" "aurora_db" {
+  name   = "aurora_db"
   vpc_id = "${var.vpc_id}"
-  description = "base_instance"
+  description = "aurora_db security group"
 
   ingress {
     protocol    = -1
@@ -19,6 +19,6 @@ resource "aws_security_group" "base_instance" {
   }
 
   tags {
-      Name = "${var.application_name}_security_group"
+      Name = "aurora_db"
   }
 }

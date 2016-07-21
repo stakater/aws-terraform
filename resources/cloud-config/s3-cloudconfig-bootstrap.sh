@@ -162,6 +162,68 @@ else
   rm -f ${regCertFile}/*
 fi
 
+#######################################################################
+# Download gocd configuration files if current module is gocd
+#
+# Download and place sudoers file in `/gocd-data/sudoers` to allow
+# GoCD to use `sudo` without password
+# Dowload and place `cruise-config.xml` to `/gocd-data/conf` to feed
+# `cruise-config.xml` to GoCD at startup
+#######################################################################
+
+# If role profile is for gocd
+if [[  $roleProfile == *"gocd"* ]] ;
+then
+  gocdDownloadDir="/gocd-downlaod"
+  mkdir -m 700 -p ${gocdDownloadDir}
+  cd ${gocdDownloadDir}
+
+  # List of config files to download
+  fileList+=()
+  fileList+=("CLUSTER-NAME_gocd/conf/sudoers")
+  fileList+=("CLUSTER-NAME_gocd/conf/cruise-config.xml")
+
+  # Download all files in the list
+  for f in "${fileList[@]}"
+  do
+    resource="/${configBucket}/$f"
+    create_string_to_sign
+    signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
+    debug_log
+    curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
+      -H "Content-Type: ${contentType}" \
+      -H "Authorization: AWS ${s3Key}:${signature}" \
+      -H "x-amz-security-token:${s3Token}" \
+      -H "Date: ${dateValue}" \
+      https://${configBucket}.s3.amazonaws.com/${f}
+  done
+
+  # Create gocd data directory
+  gocdDataDir="/gocd-data"
+  mkdir ${gocdDataDir}
+
+  # if sudoers file is downloaded and valid, copy to `gocd-data` directory
+  if [ -f ${gocdDownloadDir}/sudoers ] && grep -q "go" ${gocdDownloadDir}/sudoers ;
+  then
+    sudoersDir="${gocdDataDir}/sudoers/"
+    mkdir -p ${sudoersDir}
+    cp ${gocdDownloadDir}/sudoers ${sudoersDir}/sudoers
+  fi
+
+  # if cruise-config file is downloaded and valid, copy to `gocd-data` directory
+  if [ -f ${gocdDownloadDir}/cruise-config.xml ] && grep -q "pipeline" ${gocdDownloadDir}/cruise-config.xml ;
+  then
+    confDir="${gocdDataDir}/conf/"
+    mkdir -p ${confDir}
+    cp ${gocdDownloadDir}/cruise-config.xml ${confDir}/cruise-config.xml
+    # Change permissions of conf directory and all of its contents (wanted by gocd server)
+    chown -R 999:999 ${confDir}
+  fi
+fi
+
+# Delete temporary downloads folder
+rm -rf ${gocdDownloadDir}
+
 ########################################################################
 # Download CLUSTER-NAME-cloudinit/<profile>/clould-config.yaml
 #

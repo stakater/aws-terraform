@@ -5,10 +5,10 @@
 
 modules/admiral/admiral.tf
 modules/admiral/variables.tf
+modules/aurora_db/aurora_db.tf
+modules/aurora_db/variables.tf
 modules/docker_registry/docker_registry.tf
 modules/docker_registry/variables.tf
-modules/base_instance/base_instance.tf
-modules/base_instance/variables.tf
 modules/application_launcher/application_launcher.tf
 modules/application_launcher/variables.tf
 modules/dockerhub/dockerhub.tf
@@ -30,7 +30,6 @@ modules/vpc/*-subnet.tf
 
 resources/terraforms/module-admiral.tf
 resources/terraforms/module-docker_registry.tf
-resources/terraforms/module-base_instance.tf
 resources/terraforms/module-application_launcher.tf
 resources/terraforms/module-dockerhub.tf
 resources/terraforms/module-elb.tf

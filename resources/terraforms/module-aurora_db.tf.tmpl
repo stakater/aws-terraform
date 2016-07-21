@@ -1,0 +1,15 @@
+module "aurora_db" {
+    source = "../modules/aurora_db"
+
+    aurora_db_name = "mydb"
+    aurora_db_username = "demo"
+    aurora_db_password = "demodemodemo"
+    environment_name = "demoenv"
+
+    # vpc
+    vpc_id = "${module.vpc.vpc_id}"
+
+    # This placeholder will be replaced by module subnet id and availability zone variables
+    # For more information look into 'substitute-VPC-AZ-placeholders.sh'
+    <%MODULE-SUBNET-IDS-AND-AZS%>
+}

@@ -17,7 +17,7 @@ PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
-VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,base_instance
+VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,base_instance,aurora_db
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account
@@ -28,6 +28,7 @@ AZ_EU_WEST_1=eu-west-1a,eu-west-1b,eu-west-1c
 AZ_EU_CETNRAL_1=eu-central-1a,eu-central-1b
 AZ_AP_SOUTHEAST_1=ap-southeast-1a,ap-southeast-1b
 AZ_AP_SOUTHEAST_2=ap-southeast-2a,ap-southeast-2b,ap-southeast-2c
+AZ_AP_SOUTH_1=ap-south-1a,ap-south-1b
 AZ_AP_NORTHEAST_1=ap-northeast-1a,ap-northeast-1c
 AZ_AP_NORTHEAST_2=ap-northeast-2a,ap-northeast-2c
 AZ_SA_EAST_1=sa-east-1a,sa-east-1b,sa-east-1c
@@ -81,6 +82,7 @@ destroy:
 	@echo "Node: destroy may fail because of outstanding dependences"
 
 destroy_all: \
+	destroy_global_env \
 	destroy_admiral \
 	destroy_docker_registry \
 	destroy_dockerhub \
