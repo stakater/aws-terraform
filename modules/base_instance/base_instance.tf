@@ -1,4 +1,4 @@
-/* VPN Server -> Creating an EC2 instance on AWS */
+/* Base instance of the application from which the AMI is to be created */
 resource "aws_instance" "base_instance" {
   count = 1
   ami   = "${var.ami}"
