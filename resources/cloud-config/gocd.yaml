@@ -79,6 +79,7 @@ coreos:
                 -v /usr/bin/docker:/usr/bin/docker \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /gocd-data/sudoers:/etc/sudoers.d/sudoers \
+                -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 gocd/gocd-agent:16.5.0-3305"
@@ -108,6 +109,7 @@ coreos:
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
+                -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 gocd/gocd-agent:16.5.0-3305"
@@ -137,6 +139,7 @@ coreos:
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
+                -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 gocd/gocd-agent:16.5.0-3305"
@@ -166,6 +169,7 @@ coreos:
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
+                -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 gocd/gocd-agent:16.5.0-3305"
@@ -195,6 +199,7 @@ coreos:
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
+                -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
                 gocd/gocd-agent:16.5.0-3305"

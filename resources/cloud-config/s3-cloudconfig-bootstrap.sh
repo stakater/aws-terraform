@@ -156,8 +156,9 @@ if [ -f ${regCertDir}/ca.pem ] && grep -q "BEGIN CERTIFICATE" ${regCertDir}/ca.p
 then
   dockerCertDir="/etc/docker/certs.d/registry.CLUSTER-NAME.local:5000/"
   mkdir -p ${dockerCertDir}
-  #NOTE: copy the ca.pem file as ca.crt
-  cp ${regCertDir}/ca.pem ${dockerCertDir}/ca.crt
+  #NOTE: Rename the ca.pem file to ca.crt
+  mv ${regCertDir}/ca.pem ${regCertDir}/ca.crt
+  cp ${regCertDir}/ca.crt ${dockerCertDir}/ca.crt
 else
   rm -f ${regCertFile}/*
 fi
