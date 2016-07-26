@@ -33,9 +33,8 @@ x-amz-security-token:${s3Token}
 ${resource}"
 }
 
-DOWNLOADED=false;
 download_file_to_check() {
-  # Args: fileName configBucket
+  # Args: fileName configBucket DOWNLOADED
   tempFolder="tempDownloadDir"
   mkdir -p ${tempFolder}
   pushd ${tempFolder}
@@ -90,7 +89,7 @@ do
   create_string_to_sign
   signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
 
-  #Retry if file not uploaded
+  # Retry if file not uploaded
   retry=5
   ready=0
   until [[ $retry -eq 0 ]]  || [[ $ready -eq 1  ]]
@@ -103,7 +102,8 @@ do
     -H "x-amz-security-token:${s3Token}" \
     https://${configBucket}.s3.amazonaws.com/${registry_certificates}
 
-    # Download file to check if exists or not
+    # Download file to check if it is Successfully uploaded or not
+    DOWNLOADED=false
     download_file_to_check
     if [[ DOWNLOADED -eq true ]];
     then
