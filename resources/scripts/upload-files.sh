@@ -33,6 +33,33 @@ x-amz-security-token:${s3Token}
 ${resource}"
 }
 
+DOWNLOADED=false;
+download_file_to_check() {
+  tempDir="/etc/temp_reg"
+  mkdir -p ${tempDir}
+  regCertFile="CLUSTER-NAME_docker_registry/registry_certificates/ca.pem"
+
+  resource="/${configBucket}/${regCertFile}"
+  create_string_to_sign
+  signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
+  debug_log
+  curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
+    -H "Content-Type: ${contentType}" \
+    -H "Authorization: AWS ${s3Key}:${signature}" \
+    -H "x-amz-security-token:${s3Token}" \
+    -H "Date: ${dateValue}" \
+    https://${configBucket}.s3.amazonaws.com/${regCertFile}
+
+  # if ca.pem file is downloaded and is a valid certificate copy to docker registry certificate location
+  # else delete the downloaded files
+  if [ -f ${tempDir}/ca.pem ] && grep -q "BEGIN CERTIFICATE" ${tempDir}/ca.pem ;
+  then
+    DOWNLOADED=true;
+  else
+    DOWNLOADED=false;
+  fi
+  rm -f ${tempDir}
+}
 # Instance profile
 roleProfile=$(curl -s http://169.254.169.254/latest/meta-data/iam/info \
         | grep -Eo 'instance-profile/([a-zA-Z0-9._-]+)' \
@@ -61,11 +88,28 @@ do
   create_string_to_sign
   signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
 
-  curl -X PUT -T "${file}" \
-  -H "Host: ${configBucket}.s3.amazonaws.com" \
-  -H "Date: ${dateValue}" \
-  -H "Content-Type: ${contentType}" \
-  -H "Authorization: AWS ${s3Key}:${signature}" \
-  -H "x-amz-security-token:${s3Token}" \
-  https://${configBucket}.s3.amazonaws.com/${registry_certificates}
+  #Retry if file not uploaded
+  retry=5
+  ready=0
+  until [[ $retry -eq 0 ]]  || [[ $ready -eq 1  ]]
+  do
+    curl -X PUT -T "${file}" \
+    -H "Host: ${configBucket}.s3.amazonaws.com" \
+    -H "Date: ${dateValue}" \
+    -H "Content-Type: ${contentType}" \
+    -H "Authorization: AWS ${s3Key}:${signature}" \
+    -H "x-amz-security-token:${s3Token}" \
+    https://${configBucket}.s3.amazonaws.com/${registry_certificates}
+
+    # Download file to check if exists or not
+    download_file_to_check
+    if [[ DOWNLOADED -eq true ]];
+    then
+      ready=1
+      echo "File: $file Uploaded Successfully ..."
+    else
+      let "retry--"
+      echo "File: $file not uploaded, retrying ..."
+    fi;
+  done
 done
