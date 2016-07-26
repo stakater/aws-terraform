@@ -58,7 +58,7 @@ download_file_to_check() {
   else
     DOWNLOADED=false;
   fi
-  rm -f ${tempDir}
+  rm -r ${tempDir}
 }
 # Instance profile
 roleProfile=$(curl -s http://169.254.169.254/latest/meta-data/iam/info \
