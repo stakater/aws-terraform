@@ -35,30 +35,32 @@ ${resource}"
 
 DOWNLOADED=false;
 download_file_to_check() {
-  tempDir="/etc/temp_reg"
-  mkdir -p ${tempDir}
-  regCertFile="CLUSTER-NAME_docker_registry/registry_certificates/ca.pem"
+  # Args: fileName configBucket
+  tempFolder="tempDownloadDir"
+  mkdir -p ${tempFolder}
+  pushd ${tempFolder}
 
-  resource="/${configBucket}/${regCertFile}"
+  fileToDownload="CLUSTER-NAME_docker_registry/registry_certificates/${fileName}"
+
+  resource="/${configBucket}/${fileToDownload}"
   create_string_to_sign
-  signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
-  debug_log
+  signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Sec} -binary | base64)
+
   curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
     -H "Content-Type: ${contentType}" \
     -H "Authorization: AWS ${s3Key}:${signature}" \
     -H "x-amz-security-token:${s3Token}" \
     -H "Date: ${dateValue}" \
-    https://${configBucket}.s3.amazonaws.com/${regCertFile}
+    https://${configBucket}.s3.amazonaws.com/${fileToDownload}
 
-  # if ca.pem file is downloaded and is a valid certificate copy to docker registry certificate location
-  # else delete the downloaded files
-  if [ -f ${tempDir}/ca.pem ] && grep -q "BEGIN CERTIFICATE" ${tempDir}/ca.pem ;
+  if [ -f ${fileName} ];
   then
     DOWNLOADED=true;
   else
     DOWNLOADED=false;
   fi
-  rm -r ${tempDir}
+  popd
+  rm -rf ${tempFolder}
 }
 # Instance profile
 roleProfile=$(curl -s http://169.254.169.254/latest/meta-data/iam/info \
@@ -106,7 +108,7 @@ do
     if [[ DOWNLOADED -eq true ]];
     then
       ready=1
-      echo "File: $file Uploaded Successfully ..."
+      echo "File: $file Uploaded Successfully"
     else
       let "retry--"
       echo "File: $file not uploaded, retrying ..."
