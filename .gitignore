@@ -31,6 +31,7 @@ modules/vpc/*-subnet.tf
 resources/terraforms/module-admiral.tf
 resources/terraforms/module-docker_registry.tf
 resources/terraforms/module-application_launcher.tf
+resources/terraforms/module-aurora_db.tf
 resources/terraforms/module-dockerhub.tf
 resources/terraforms/module-elb.tf
 resources/terraforms/module-elk.tf
