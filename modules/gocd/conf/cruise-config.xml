@@ -6,7 +6,6 @@
       <params>
         <param name="SOURCE_DIR" />
         <param name="BUILD_DOCKER_IMAGE"></param>
-        <param name="BUILD_DOCKER_IMAGE_NAME"></param>
         <param name="BUILD_DOCKER_IMAGE_OPTS"></param>
         <param name="BUILT_WAR_FILE"></param>
         <param name="APP_COMPILE_CMD"></param>
@@ -33,17 +32,17 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker run -d --name #{BUILD_DOCKER_IMAGE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
+                <arg>sudo docker run -d --name build_img_${GO_PIPELINE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
                 <runif status="any" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker cp ./ #{BUILD_DOCKER_IMAGE_NAME}:/app</arg>
+                <arg>sudo docker cp ./ build_img_${GO_PIPELINE_NAME}:/app</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker exec #{BUILD_DOCKER_IMAGE_NAME} /bin/bash -c "#{APP_COMPILE_CMD}"</arg>
+                <arg>sudo docker exec build_img_${GO_PIPELINE_NAME} /bin/bash -c "#{APP_COMPILE_CMD}"</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -56,7 +55,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker exec #{BUILD_DOCKER_IMAGE_NAME} /bin/bash -c "#{APP_TEST_CMD}"</arg>
+                <arg>sudo docker exec build_img_${GO_PIPELINE_NAME} /bin/bash -c "#{APP_TEST_CMD}"</arg>
                 <runif status="any" />
               </exec>
             </tasks>
@@ -72,22 +71,22 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker exec #{BUILD_DOCKER_IMAGE_NAME} /bin/bash -c "#{APP_PACKAGE_CMD}"</arg>
+                <arg>sudo docker exec build_img_${GO_PIPELINE_NAME} /bin/bash -c "#{APP_PACKAGE_CMD}"</arg>
                 <runif status="any" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker cp #{BUILD_DOCKER_IMAGE_NAME}:#{BUILT_WAR_FILE} #{APP_IMAGE_BUILD_DIR}/</arg>
+                <arg>sudo docker cp build_img_${GO_PIPELINE_NAME}:#{BUILT_WAR_FILE} #{APP_IMAGE_BUILD_DIR}/</arg>
                 <runif status="passed" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker stop #{BUILD_DOCKER_IMAGE_NAME}</arg>
+                <arg>sudo docker stop build_img_${GO_PIPELINE_NAME}</arg>
                 <runif status="any" />
               </exec>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker rm -v #{BUILD_DOCKER_IMAGE_NAME}</arg>
+                <arg>sudo docker rm -v build_img_${GO_PIPELINE_NAME}</arg>
                 <runif status="any" />
               </exec>
             </tasks>
