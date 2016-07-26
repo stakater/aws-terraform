@@ -33,6 +33,34 @@ x-amz-security-token:${s3Token}
 ${resource}"
 }
 
+download_file_to_check() {
+  # Args: fileName configBucket DOWNLOADED
+  tempFolder="tempDownloadDir"
+  mkdir -p ${tempFolder}
+  pushd ${tempFolder}
+
+  fileToDownload="CLUSTER-NAME_docker_registry/registry_certificates/${fileName}"
+
+  resource="/${configBucket}/${fileToDownload}"
+  create_string_to_sign
+  signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Sec} -binary | base64)
+
+  curl -s -L -O -H "Host: ${configBucket}.s3.amazonaws.com" \
+    -H "Content-Type: ${contentType}" \
+    -H "Authorization: AWS ${s3Key}:${signature}" \
+    -H "x-amz-security-token:${s3Token}" \
+    -H "Date: ${dateValue}" \
+    https://${configBucket}.s3.amazonaws.com/${fileToDownload}
+
+  if [ -f ${fileName} ];
+  then
+    DOWNLOADED=true;
+  else
+    DOWNLOADED=false;
+  fi
+  popd
+  rm -rf ${tempFolder}
+}
 # Instance profile
 roleProfile=$(curl -s http://169.254.169.254/latest/meta-data/iam/info \
         | grep -Eo 'instance-profile/([a-zA-Z0-9._-]+)' \
@@ -61,11 +89,29 @@ do
   create_string_to_sign
   signature=$(/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64)
 
-  curl -X PUT -T "${file}" \
-  -H "Host: ${configBucket}.s3.amazonaws.com" \
-  -H "Date: ${dateValue}" \
-  -H "Content-Type: ${contentType}" \
-  -H "Authorization: AWS ${s3Key}:${signature}" \
-  -H "x-amz-security-token:${s3Token}" \
-  https://${configBucket}.s3.amazonaws.com/${registry_certificates}
+  # Retry if file not uploaded
+  retry=5
+  ready=0
+  until [[ $retry -eq 0 ]]  || [[ $ready -eq 1  ]]
+  do
+    curl -X PUT -T "${file}" \
+    -H "Host: ${configBucket}.s3.amazonaws.com" \
+    -H "Date: ${dateValue}" \
+    -H "Content-Type: ${contentType}" \
+    -H "Authorization: AWS ${s3Key}:${signature}" \
+    -H "x-amz-security-token:${s3Token}" \
+    https://${configBucket}.s3.amazonaws.com/${registry_certificates}
+
+    # Download file to check if it is Successfully uploaded or not
+    DOWNLOADED=false
+    download_file_to_check
+    if [[ DOWNLOADED -eq true ]];
+    then
+      ready=1
+      echo "File: $file Uploaded Successfully"
+    else
+      let "retry--"
+      echo "File: $file not uploaded, retrying ..."
+    fi;
+  done
 done
