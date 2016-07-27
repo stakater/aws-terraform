@@ -11,5 +11,5 @@
       /usr/bin/docker run -v /etc/sysconfig/:/etc/sysconfig/ $image /etcd-aws-cluster
 
       # upload etcd initial-cluster urls to s3 bucket for worker cluster's etcd_proxy
-      /usr/bin/docker run -e CLUSTER_NAME="CLUSTER-NAME"-v /etc/sysconfig/:/etc/sysconfig/ $image /etcd-aws-proxy
+      /usr/bin/docker run -e CLUSTER_NAME="CLUSTER-NAME" -v /etc/sysconfig/:/etc/sysconfig/ $image /etcd-aws-proxy
 
