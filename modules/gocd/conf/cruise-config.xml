@@ -141,6 +141,45 @@
           </job>
         </jobs>
       </stage>
+      <stage name="Deploy-to-Dev" fetchMaterials="false">
+        <jobs>
+          <job name="Run">
+            <tasks>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>git config --global user.email "you@example.com"
+                     git config --global user.name "Your Name"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>if [ ! -d "/app/app-dev-unit" ]; then sudo mkdir -p /app/app-dev-unit; sudo chown go:go /app/app-dev-unit;fi; \
+                    if [ ! "$(ls -A /app/app-dev-unit)" ]; then git clone https://github.com/stakater/app-dev-unit.git /app/app-dev-unit; else cd /app/app-dev-unit; git pull origin master; fi;</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>cd /app/app-dev-unit; ./substitute-Docker-vars.sh -f application.service.tmpl -d "#{APP_DOCKER_IMAGE}" -o "#{APP_DOCKER_OPTS}"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>cd /app/app-dev-unit; sudo mv application.service application-#{APP_NAME}.service</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
+                <arg>-c</arg>
+                <arg>host_ip=$(ip route show | awk '/default/ {print $3}');
+                     fleet_endpoint=$(curl -s -L http://${host_ip}:4001/v2/keys/stakater/dev/ip | jq '.node.value' | sed s/\"//g);
+                     cd /app/app-dev-unit;
+                     fleetctl --etcd-key-prefix=/stakater/dev/ --endpoint=http://${fleet_endpoint}:4001 destroy application-#{APP_NAME}.service
+                     fleetctl --etcd-key-prefix=/stakater/dev/ --endpoint=http://${fleet_endpoint}:4001 start application-#{APP_NAME}.service</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
       <stage name="Make-AMI" fetchMaterials="false">
         <approval type="manual" />
         <jobs>
