@@ -15,9 +15,13 @@ VM_TYPE=hvm
 # For route53.tf
 PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 
+# Development cluster variables, required by worker_dev module
+DEV_APP_FROM_PORT:= 8080
+DEV_APP_TO_PORT:= 8081
+
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
-VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,aurora_db
+VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,worker_dev,aurora_db
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account
@@ -82,7 +86,6 @@ destroy:
 	@echo "Node: destroy may fail because of outstanding dependences"
 
 destroy_all: \
-	destroy_global_env \
 	destroy_admiral \
 	destroy_docker_registry \
 	destroy_dockerhub \
@@ -90,6 +93,7 @@ destroy_all: \
 	destroy_elk \
 	destroy_worker \
 	destroy_application_launcher \
+	destroy_worker_dev \
 	destroy_etcd \
 	destroy_efs \
 	destroy_elb \
@@ -97,6 +101,7 @@ destroy_all: \
 	destroy_iam \
 	destroy_route53 \
 	destroy_s3 \
+	destroy_aurora_db \
 	destroy_vpc
 
 clean_all: destroy_all
