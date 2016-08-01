@@ -3,11 +3,12 @@
 # gocd cloud-config
 coreos:
   etcd2:
-    discovery: https://discovery.etcd.io/7153f3975bbba2e62260a1f6bbef737b
+    proxy: on
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
   fleet:
     public-ip: $private_ipv4
     metadata: "env=CLUSTER-NAME,platform=ec2,provider=aws,role=gocd"
+    etcd_key_prefix: "/stakater/gocd/"
   update:
     reboot-strategy: off
   units:
@@ -20,21 +21,6 @@ coreos:
             EnvironmentFile=/etc/sysconfig/initial-cluster
     - name: fleet.service
       command: start
-    - name: update-window.service
-      command: start
-      content: |
-        [Unit]
-        Description=Reboot if an update has been downloaded
-        ConditionPathExists=/opt/bin/update-window.sh
-        [Service]
-        ExecStart=/opt/bin/update-window.sh
-    - name: update-window.timer
-      command: start
-      content: |
-        [Unit]
-        Description=Reboot timer
-        [Timer]
-        OnCalendar=*-*-* 05,06:00/30:00
     - name: gocd-server.service
       command: start
       content: |
@@ -71,7 +57,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789abcdef \
@@ -79,10 +65,11 @@ coreos:
                 -v /usr/bin/docker:/usr/bin/docker \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /gocd-data/sudoers:/etc/sudoers.d/sudoers \
+                -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                gocd/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.5.0-3305"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -99,7 +86,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789zxcvb \
@@ -108,11 +95,12 @@ coreos:
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
+                -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                gocd/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.5.0-3305"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -129,7 +117,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789mnbvcx \
@@ -138,11 +126,12 @@ coreos:
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
+                -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                gocd/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.5.0-3305"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -159,7 +148,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789lkjhgf \
@@ -168,11 +157,12 @@ coreos:
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
+                -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                gocd/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.5.0-3305"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
@@ -189,7 +179,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         TimeoutStartSec=0
-        ExecStartPre=/usr/bin/docker pull gocd/gocd-agent:16.5.0-3305
+        ExecStartPre=/usr/bin/docker pull stakater/gocd-agent:16.5.0-3305
         ExecStartPre=-/usr/bin/docker rm %n
         ExecStart=/usr/bin/sh -c "/usr/bin/docker run --rm --name %n \
                 -e AGENT_KEY=123456789ytrewq \
@@ -198,11 +188,12 @@ coreos:
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
+                -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
-                gocd/gocd-agent:16.5.0-3305"
+                stakater/gocd-agent:16.5.0-3305"
         ExecStop=-/usr/bin/docker stop %n
         RestartSec=10
         Restart=always
