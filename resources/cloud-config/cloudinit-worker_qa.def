@@ -1,0 +1,6 @@
+# EC2 user-date segment files, relative to build dir
+cloud-config/worker_qa.yaml
+cloud-config/systemd-units.yaml
+cloud-config/base.yaml
+cloud-config/files.yaml
+cloud-config/aws-files.yaml

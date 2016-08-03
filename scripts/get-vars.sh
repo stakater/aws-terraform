@@ -10,6 +10,9 @@ PRIVATE_DOMAIN=${PRIVATE_DOMAIN}
 # worker_dev variables
 DEV_APP_FROM_PORT=${DEV_APP_FROM_PORT}
 DEV_APP_TO_PORT=${DEV_APP_TO_PORT}
+# worker_qa variables
+QA_APP_FROM_PORT=${QA_APP_FROM_PORT}
+QA_APP_TO_PORT=${QA_APP_TO_PORT}
 
 AWS_PROFILE=${AWS_PROFILE}
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
@@ -44,4 +47,6 @@ variable "ami" { default = "`curl -s $url`" }
 variable "private_domain" { default = "${PRIVATE_DOMAIN}"}
 variable "dev_app_from_port" { default = "${DEV_APP_FROM_PORT}"}
 variable "dev_app_to_port" { default = "${DEV_APP_TO_PORT}"}
+variable "qa_app_from_port" { default = "${QA_APP_FROM_PORT}"}
+variable "qa_app_to_port" { default = "${QA_APP_TO_PORT}"}
 EOF

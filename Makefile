@@ -19,9 +19,14 @@ PRIVATE_DOMAIN=$(CLUSTER_NAME).local
 DEV_APP_FROM_PORT:= 8080
 DEV_APP_TO_PORT:= 8081
 
+# QA cluster variables, required by worker_qa module
+QA_APP_FROM_PORT:= 8080
+QA_APP_TO_PORT:= 8081
+
+
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
-VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker,elb,rds,worker_dev,aurora_db
+VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker_dev,worker_qa,elb,rds,aurora_db
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account
@@ -77,12 +82,12 @@ all: worker
 
 help:
 	@echo "Usage: make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )"
-	@echo "Available resources: vpc s3 route53 iam efs elb etcd worker dockerhub admiral rds"
-	@echo "For example: make plan_worker # to show what resources are planned for worker"
+	@echo "Available resources: vpc s3 route53 iam efs elb etcd worker_dev dockerhub admiral rds"
+	@echo "For example: make plan_worker_dev # to show what resources are planned for worker_dev"
 
 destroy:
 	@echo "Usage: make destroy_<resource>"
-	@echo "For example: make destroy_worker"
+	@echo "For example: make destroy_worker_dev"
 	@echo "Node: destroy may fail because of outstanding dependences"
 
 destroy_all: \
@@ -91,9 +96,9 @@ destroy_all: \
 	destroy_dockerhub \
 	destroy_gocd \
 	destroy_elk \
-	destroy_worker \
-	destroy_application_launcher \
+	destroy_worker_qa \
 	destroy_worker_dev \
+	destroy_application_launcher \
 	destroy_etcd \
 	destroy_efs \
 	destroy_elb \
