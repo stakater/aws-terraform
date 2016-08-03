@@ -182,6 +182,7 @@ then
   fileList+=()
   fileList+=("CLUSTER-NAME_gocd/conf/sudoers")
   fileList+=("CLUSTER-NAME_gocd/conf/cruise-config.xml")
+  fileList+=("CLUSTER-NAME_gocd/conf/passwd")
   fileList+=("CLUSTER-NAME_gocd/route53/record-change-batch.json.tmpl")
   fileList+=("CLUSTER-NAME_gocd/route53/substitite-record-values.sh")
 
@@ -220,6 +221,11 @@ then
     cp ${gocdDownloadDir}/cruise-config.xml ${confDir}/cruise-config.xml
     # Change permissions of conf directory and all of its contents (wanted by gocd server)
     chown -R 999:999 ${confDir}
+  fi
+  # if sudoers file is downloaded and valid, copy to `gocd-data` directory
+  if [ -f ${gocdDownloadDir}/passwd ]  ;
+  then
+    cp ${gocdDownloadDir}/passwd ${gocdDataDir}/passwd
   fi
 
   # if record-change-batch.json.tmpl file is downloaded and valid, copy to `gocd-data` directory

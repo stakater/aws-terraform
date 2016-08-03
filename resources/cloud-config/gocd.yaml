@@ -41,6 +41,7 @@ coreos:
                                   -e AGENT_KEY=123456789lkjhgf \
                                   -e AGENT_KEY=123456789ytrewq \
                                   -v /gocd-data/conf:/etc/go \
+                                  -v /gocd-data/passwd:/passwd \
                                   gocd/gocd-server:16.5.0-3305"
         ExecStop=/usr/bin/docker stop %n
         RestartSec=10
@@ -64,7 +65,9 @@ coreos:
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v /usr/bin/docker:/usr/bin/docker \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
-                -v /gocd-data/sudoers:/etc/sudoers.d/sudoers \
+                -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
+                -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
+                -v /gocd-data/sudoers:/etc/sudoers.d \
                 -v /gocd-data/route53:/gocd-data/route53 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /etc/registry_certificates:/etc/registry_certificates \
