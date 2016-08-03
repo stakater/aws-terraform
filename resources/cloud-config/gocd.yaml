@@ -65,6 +65,7 @@ coreos:
                 -v /usr/bin/docker:/usr/bin/docker \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /gocd-data/sudoers:/etc/sudoers.d/sudoers \
+                -v /gocd-data/route53:/gocd-data/route53 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
@@ -97,6 +98,7 @@ coreos:
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
+                -v /gocd-data/route53:/gocd-data/route53 \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
@@ -128,6 +130,7 @@ coreos:
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
+                -v /gocd-data/route53:/gocd-data/route53 \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
@@ -159,6 +162,7 @@ coreos:
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
+                -v /gocd-data/route53:/gocd-data/route53 \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \
@@ -190,6 +194,7 @@ coreos:
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
+                -v /gocd-data/route53:/gocd-data/route53 \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \
                 --link gocd-server.service:go-server \

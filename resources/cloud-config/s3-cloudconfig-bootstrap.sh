@@ -182,6 +182,8 @@ then
   fileList+=()
   fileList+=("CLUSTER-NAME_gocd/conf/sudoers")
   fileList+=("CLUSTER-NAME_gocd/conf/cruise-config.xml")
+  fileList+=("CLUSTER-NAME_gocd/route53/record-change-batch.json.tmpl")
+  fileList+=("CLUSTER-NAME_gocd/route53/substitite-record-values.sh")
 
   # Download all files in the list
   for f in "${fileList[@]}"
@@ -219,10 +221,26 @@ then
     # Change permissions of conf directory and all of its contents (wanted by gocd server)
     chown -R 999:999 ${confDir}
   fi
-fi
 
-# Delete temporary downloads folder
-rm -rf ${gocdDownloadDir}
+  # if record-change-batch.json.tmpl file is downloaded and valid, copy to `gocd-data` directory
+  if [ -f ${gocdDownloadDir}/record-change-batch.json.tmpl ] && grep -q "ResourceRecordSet" ${gocdDownloadDir}/record-change-batch.json.tmpl ;
+  then
+    route53Dir="${gocdDataDir}/route53/"
+    mkdir -p ${route53Dir}
+    cp ${gocdDownloadDir}/record-change-batch.json.tmpl ${route53Dir}/record-change-batch.json.tmpl
+  fi
+
+  # if record-change-batch.json.tmpl file is downloaded and valid, copy to `gocd-data` directory
+  if [ -f ${gocdDownloadDir}/substitite-record-values.sh ] && grep -q "substitues" ${gocdDownloadDir}/substitite-record-values.sh ;
+  then
+    route53Dir="${gocdDataDir}/route53/"
+    mkdir -p ${route53Dir}
+    cp ${gocdDownloadDir}/substitite-record-values.sh ${route53Dir}/substitite-record-values.sh
+  fi
+
+  # Delete temporary downloads folder
+  rm -rf ${gocdDownloadDir}
+fi
 
 ########################################################################
 # Download CLUSTER-NAME-cloudinit/<profile>/clould-config.yaml
