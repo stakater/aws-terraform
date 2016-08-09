@@ -1,0 +1,37 @@
+#
+# worker_qa load balancer configurations
+#
+resource "aws_elb" "worker_qa" {
+  name = "${var.cluster_name}_worker_qa_elb"
+  availability_zones = <%MODULE-AZ-VARIABLES-ARRAY%>
+
+  listener {
+    instance_port = "${var.http_instance_port}"
+    instance_protocol = "http"
+    lb_port = "${var.http_lb_port}"
+    lb_protocol = "http"
+  }
+
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 3
+    target = "${var.health_check_target}"
+    interval = 30
+  }
+
+  cross_zone_load_balancing = true
+  idle_timeout = 400
+  connection_draining = true
+  connection_draining_timeout = 400
+
+  tags {
+    Name = "${var.cluster_name}_worker_qa_elb"
+  }
+}
+
+resource "aws_lb_cookie_stickiness_policy" "worker_qa_stickiness_policy" {
+      name = "${var.cluster_name}_worker_qa_elb_stickiness_policy"
+      load_balancer = "${aws_elb.worker_qa.id}"
+      lb_port = "${var.http_lb_port}"
+}
