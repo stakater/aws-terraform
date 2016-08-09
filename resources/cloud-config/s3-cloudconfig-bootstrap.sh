@@ -237,7 +237,7 @@ then
   fi
 
   # if record-change-batch.json.tmpl file is downloaded and valid, copy to `gocd-data` directory
-  if [ -f ${gocdDownloadDir}/substitite-record-values.sh ] && grep -q "substitues" ${gocdDownloadDir}/substitite-record-values.sh ;
+  if [ -f ${gocdDownloadDir}/substitite-record-values.sh ] ;
   then
     route53Dir="${gocdDataDir}/route53/"
     mkdir -p ${route53Dir}
