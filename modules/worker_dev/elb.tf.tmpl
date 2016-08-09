@@ -1,8 +1,8 @@
 #
-# worker_qa load balancer configurations
+# worker_dev load balancer configurations
 #
-resource "aws_elb" "worker_qa" {
-  name = "${var.cluster_name}-worker-qa-elb"
+resource "aws_elb" "worker_dev" {
+  name = "${var.cluster_name}-worker-dev-elb"
   # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables
   subnets = <%MODULE-ID-VARIABLES-ARRAY%>
 
@@ -27,12 +27,12 @@ resource "aws_elb" "worker_qa" {
   connection_draining_timeout = 400
 
   tags {
-    Name = "${var.cluster_name}_worker_qa_elb"
+    Name = "${var.cluster_name}_worker_dev_elb"
   }
 }
 
-resource "aws_lb_cookie_stickiness_policy" "worker_qa_stickiness_policy" {
-      name = "${var.cluster_name}-worker-qa-elb-stickiness-policy"
-      load_balancer = "${aws_elb.worker_qa.id}"
+resource "aws_lb_cookie_stickiness_policy" "worker_dev_stickiness_policy" {
+      name = "${var.cluster_name}-worker-dev-elb-stickiness-policy"
+      load_balancer = "${aws_elb.worker_dev.id}"
       lb_port = "${var.http_lb_port}"
 }

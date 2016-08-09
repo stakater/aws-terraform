@@ -16,6 +16,11 @@ variable "cluster_name" { }
 variable "vpc_id" { }
 variable "vpc_cidr" { }
 
+# Elb vars
+variable "http_instance_port" { default = 8080 }
+variable "http_lb_port" { default = 80 }
+variable "health_check_target" { default = "HTTP:8080/"}
+
 # Application port
 variable "application_from_port" { default = 8080 }
 variable "application_to_port" { default = 8080 }

@@ -11,6 +11,7 @@ resource "aws_autoscaling_group" "worker_dev" {
 
   health_check_type = "EC2"
   force_delete = true
+  load_balancers = [ "${aws_elb.worker_dev.name}" ]
 
   launch_configuration = "${aws_launch_configuration.worker_dev.name}"
   # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables

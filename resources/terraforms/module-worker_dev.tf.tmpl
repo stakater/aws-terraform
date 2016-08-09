@@ -19,6 +19,11 @@ module "worker_dev" {
     # vpc
     vpc_id = "${module.vpc.vpc_id}"
     vpc_cidr = "${module.vpc.vpc_cidr}"
+    
+    # elb
+    http_instance_port = 8080
+    http_lb_port = 80
+    health_check_target = "HTTP:8080/"
 
     # dev app variables
     application_from_port = "${var.dev_app_from_port}"
