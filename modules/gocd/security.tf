@@ -17,7 +17,7 @@ resource "aws_security_group" "gocd"  {
       from_port = 8153
       to_port = 8153
       protocol = "tcp"
-      cidr_blocks = [ "${var.vpc_cidr}" ]
+      cidr_blocks = [ "0.0.0.0/0" ]
     }
 
     # Allow SSH from my hosts
