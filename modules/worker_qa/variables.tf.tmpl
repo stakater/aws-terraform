@@ -20,6 +20,7 @@ variable "vpc_cidr" { }
 variable "http_instance_port" { default = 8080 }
 variable "http_lb_port" { default = 80 }
 variable "health_check_target" { default = "HTTP:8080/"}
+variable "route53_private_zone_id" { }
 
 # Application port
 variable "application_from_port" { default = 8080 }

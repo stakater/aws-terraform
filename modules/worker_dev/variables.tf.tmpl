@@ -16,6 +16,9 @@ variable "cluster_name" { }
 variable "vpc_id" { }
 variable "vpc_cidr" { }
 
+# route53
+variable "route53_private_zone_id" { }
+
 # Elb vars
 variable "http_instance_port" { default = 8080 }
 variable "http_lb_port" { default = 80 }

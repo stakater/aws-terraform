@@ -16,6 +16,12 @@ variable "cluster_name" { }
 variable "vpc_id" { }
 variable "vpc_cidr" { }
 
+# Elb vars
+variable "http_instance_port" { default = 8080 }
+variable "http_lb_port" { default = 80 }
+variable "health_check_target" { default = "HTTP:8080/"}
+variable "route53_private_zone_id" { }
+
 # Application port
 variable "application_from_port" { default = 8080 }
 variable "application_to_port" { default = 8080 }
@@ -23,11 +29,9 @@ variable "application_to_port" { default = 8080 }
 # This placeholder will be replaced by module subnet id and availability zone tf variable definations
 # For more information look into 'substitute-VPC-AZ-placeholders.sh'
 
+		variable "worker_qa_subnet_a_id" { }
+		variable "worker_qa_subnet_az_a" { }
 		variable "worker_qa_subnet_b_id" { }
 		variable "worker_qa_subnet_az_b" { }
 		variable "worker_qa_subnet_c_id" { }
 		variable "worker_qa_subnet_az_c" { }
-		variable "worker_qa_subnet_d_id" { }
-		variable "worker_qa_subnet_az_d" { }
-		variable "worker_qa_subnet_e_id" { }
-		variable "worker_qa_subnet_az_e" { }

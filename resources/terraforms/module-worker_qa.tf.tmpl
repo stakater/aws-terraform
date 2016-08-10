@@ -24,10 +24,12 @@ module "worker_qa" {
     http_instance_port = 8080
     http_lb_port = 80
     health_check_target = "HTTP:8080/"
+    route53_private_zone_id = "${module.route53.private_zone_id}"
 
     # qa app variables
     application_from_port = "${var.qa_app_from_port}"
     application_to_port = "${var.qa_app_to_port}"
+
 
     # This placeholder will be replaced by ADMIRAL subnet id and availability zone variables
     # For more information look into 'substitute-VPC-AZ-placeholders.sh'

@@ -36,3 +36,16 @@ resource "aws_lb_cookie_stickiness_policy" "worker_dev_stickiness_policy" {
       load_balancer = "${aws_elb.worker_dev.id}"
       lb_port = "${var.http_lb_port}"
 }
+
+# DNS registration
+resource "aws_route53_record" "private-worker-dev" {
+  zone_id = "${var.route53_private_zone_id}"
+  name = "worker-dev"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.worker_dev.dns_name}"
+    zone_id = "${aws_elb.worker_dev.zone_id}"
+    evaluate_target_health = true
+  }
+}
