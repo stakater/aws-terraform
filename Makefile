@@ -12,8 +12,15 @@ CLUSTER_NAME := coreos-cluster
 # For get-vars.sh
 COREOS_UPDATE_CHANNEL=beta
 VM_TYPE=hvm
+
 # For route53.tf
 PRIVATE_DOMAIN=$(CLUSTER_NAME).local
+PUBLIC_DOMAIN=mydomain.com
+
+# Site certificate paths for ELB HTTPS setup
+CERTIFICATE_BODY_PATH = ${HOME}/.stakater/certs/site.crt
+CERTIFICATE_CHAIN_PATH := ${HOME}/.stakater/certs/chaincert.crt
+PRIVATE_KEY_PATH := ${HOME}/.stakater/certs/site.key
 
 # Development cluster variables, required by worker_dev module
 DEV_APP_FROM_PORT:= 8080
@@ -22,7 +29,6 @@ DEV_APP_TO_PORT:= 8081
 # QA cluster variables, required by worker_qa module
 QA_APP_FROM_PORT:= 8080
 QA_APP_TO_PORT:= 8081
-
 
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
