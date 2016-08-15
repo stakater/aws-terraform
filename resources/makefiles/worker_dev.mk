@@ -1,10 +1,10 @@
-worker_dev: vpc s3 iam route53 plan_worker_dev upload_worker_dev_userdata
+worker_dev: vpc s3 iam route53 server_certificate plan_worker_dev upload_worker_dev_userdata
 	cd $(BUILD); \
 		$(SCRIPTS)/aws-keypair.sh -c worker_dev; \
 		$(TF_APPLY) -target module.worker_dev
 	@$(MAKE) worker_dev_ips
 
-plan_worker_dev: plan_vpc plan_s3 plan_iam plan_route53 init_worker_dev
+plan_worker_dev: plan_vpc plan_s3 plan_iam plan_route53 plan_server_certificate init_worker_dev
 	cd $(BUILD); \
 		$(TF_PLAN) -target module.worker_dev;
 
