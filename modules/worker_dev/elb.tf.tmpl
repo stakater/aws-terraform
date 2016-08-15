@@ -1,6 +1,10 @@
 #
 # worker_dev load balancer configurations
 #
+
+#############
+# ELB
+#############
 resource "aws_elb" "worker_dev" {
   name = "${var.cluster_name}-worker-dev-elb"
   # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables
@@ -11,6 +15,14 @@ resource "aws_elb" "worker_dev" {
     instance_protocol = "http"
     lb_port = "${var.http_lb_port}"
     lb_protocol = "http"
+  }
+
+  listener {
+    instance_port = "${var.https_instance_port}"
+    instance_protocol = "http"
+    lb_port = "${var.https_lb_port}"
+    lb_protocol = "https"
+    ssl_certificate_id = "${var.iam_server_certificate_arn}"
   }
 
   health_check {
@@ -26,18 +38,25 @@ resource "aws_elb" "worker_dev" {
   connection_draining = true
   connection_draining_timeout = 400
 
+  security_groups = [ "${aws_security_group.worker_dev_elb.id}" ]
+
   tags {
     Name = "${var.cluster_name}_worker_dev_elb"
   }
 }
 
+#########################
+# ELB Stickiness policy
+#########################
 resource "aws_lb_cookie_stickiness_policy" "worker_dev_stickiness_policy" {
       name = "${var.cluster_name}-worker-dev-elb-stickiness-policy"
       load_balancer = "${aws_elb.worker_dev.id}"
       lb_port = "${var.http_lb_port}"
 }
 
-# DNS registration
+###########################
+# Route53 DNS Registration
+###########################
 resource "aws_route53_record" "private-worker-dev" {
   zone_id = "${var.route53_private_zone_id}"
   name = "worker-dev"
@@ -48,4 +67,53 @@ resource "aws_route53_record" "private-worker-dev" {
     zone_id = "${aws_elb.worker_dev.zone_id}"
     evaluate_target_health = true
   }
+}
+
+resource "aws_route53_record" "public-worker-dev" {
+  zone_id = "${var.route53_public_zone_id}"
+  name = "${var.route53_public_name}"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.worker_dev.dns_name}"
+    zone_id = "${aws_elb.worker_dev.zone_id}"
+    evaluate_target_health = true
+  }
+}
+
+#######################
+## ELB Security Group
+#######################
+resource "aws_security_group" "worker_dev_elb"  {
+    name = "worker_dev_elb"
+    vpc_id = "${var.vpc_id}"
+    description = "Security group for worker dev ELB"
+
+    # Allow all outbound traffic
+    egress {
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    # Allow access to HTTP ELB port
+    ingress {
+      from_port = "${var.http_lb_port}"
+      to_port = "${var.http_lb_port}"
+      protocol = "tcp"
+      cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    # Allow access to HTTPS ELB port
+    ingress {
+      from_port = "${var.https_lb_port}"
+      to_port = "${var.https_lb_port}"
+      protocol = "tcp"
+      cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    tags {
+      Name = "worker_dev_elb"
+    }
 }
