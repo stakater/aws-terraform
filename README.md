@@ -19,7 +19,7 @@
 
 ## Overview
 
-This is a practical implementation of [CoreOS cluster architectures ] 
+This is a practical implementation of [CoreOS cluster architectures ]
 (https://coreos.com/os/docs/latest/cluster-architectures.html) built on AWS.
 
 The cluster follows CoreOS production cluster model that contains an autoscaling _etcd_ cluster, and an autoscaling _worker_ cluster for hosted containers. You can optionally add an _admiral_ cluster for shared services such as CI, private docker registry, logging and monitoring, etc.
@@ -39,7 +39,7 @@ Go to [AWS Console](https://console.aws.amazon.com/).
 
 ## Install tools
 
-If you use [Vagrant](https://www.vagrantup.com/), you can skip this section and go to 
+If you use [Vagrant](https://www.vagrantup.com/), you can skip this section and go to
 [Quick Start](#quick-start) section.
 
 Instructions for install tools on MacOS:
@@ -101,13 +101,13 @@ $ aws configure --profile coreos-cluster
 
 Use the [downloaded aws user credentials](#setup-aws-credentials) when prompted.
 
-The above command will create a __coreos-cluster__ profile authentication section in ~/.aws/config and ~/.aws/credentials files. The build process bellow will automatically configure Terraform AWS provider credentials using this profile. 
+The above command will create a __coreos-cluster__ profile authentication section in ~/.aws/config and ~/.aws/credentials files. The build process bellow will automatically configure Terraform AWS provider credentials using this profile.
 
 #### To build:
 
-This default build will create one etcd node and one worker node cluster in a VPC, 
-with application buckets for data, necessary iam roles, polices, keypairs and keys. 
-The instance type for the nodes is t2.micro. You can review the configuration and 
+This default build will create one etcd node and one worker node cluster in a VPC,
+with application buckets for data, necessary iam roles, polices, keypairs and keys.
+The instance type for the nodes is t2.micro. You can review the configuration and
 make changes if needed. See [Customization](#customization) for details.
 
 ```
@@ -165,7 +165,7 @@ This will destroy ALL resources created by this project.
 
 ## Customization
 
-* The default values for VPC, ec2 instance profile, policies, keys, autoscaling group, lanuch configurations etc., 
+* The default values for VPC, ec2 instance profile, policies, keys, autoscaling group, lanuch configurations etc.,
 can be override in resources/terraform/module-<resource>.tf` files.
 
 * AWS profile and cluster name are defined at the top of  _Makefile_:
@@ -174,13 +174,13 @@ can be override in resources/terraform/module-<resource>.tf` files.
   AWS_PROFILE := coreos-cluster
   CLUSTER_NAME := coreos-cluster
   ```
-  
+
   These can also be customized to match your AWS profile and cluster name.
 
 
 ## Build multi-node cluster
 
-The number of etcd nodes and worker nodes are defined in *resource/terraform/module-etcd.tf* 
+The number of etcd nodes and worker nodes are defined in *resource/terraform/module-etcd.tf*
 and *resource/terraform/module-worker.tf*
 
 Change the cluster_desired_capacity in the file to build multi-nodes etcd/worker cluster,
@@ -192,7 +192,7 @@ for example, change to 3:
 
 Note: etcd minimum, maximum and cluster_desired_capacity should be the same and in odd number, e.g. 3, 5, 9
 
-You should also change the [aws_instance_type](http://aws.amazon.com/ec2/instance-types) 
+You should also change the [aws_instance_type](http://aws.amazon.com/ec2/instance-types)
 from `micro` to `medium` or `large` if heavy docker containers to be hosted on the nodes:
 
 ```
@@ -239,7 +239,7 @@ fa9f4ea7... 10.0.5.140  env=coreos-cluster,platform=ec2,provider=aws,region=us-w
 
 ## Manage individual platform resources
 
-You can create individual resources and the automated-scripts will create resources automatically based on dependencies. 
+You can create individual resources and the automated-scripts will create resources automatically based on dependencies.
 ```
 $ make help
 
@@ -249,7 +249,7 @@ For example: make worker # to show what resources are planned for worker
 ```
 
 Currently defined resources:
-  
+
 Resource | Description
 --- | ---
 *vpc* | VPC, gateway, and subnets
@@ -276,31 +276,31 @@ $ make worker
 
 Make commands can be re-run. If a resource already exists, it just refreshes the terraform status.
 
-This will create a build/<resource> directory, copy all terraform files to the build dir, 
+This will create a build/<resource> directory, copy all terraform files to the build dir,
 and execute correspondent terraform cmd to build the resource on AWS.
 
 To destroy a resource:
 
 ```
-$ make destroy_<resource> 
+$ make destroy_<resource>
 ```
 
 ## Technical notes
 * Etcd cluster is on an autoscaling group. It should be set with a fixed, odd number (1,3,5..), and cluster_desired_capacity=min_size=max_size.
-* Cluster discovery is managed with [dockerage/etcd-aws-cluster](https://hub.docker.com/r/dockerage/etcd-aws-cluster/) image. etcd cluster is formed by self-discover through its auto-scaling group and then an etcd initial cluster is updated automatically to s3://AWS-ACCOUNT-CLUSTER-NAME-cloudinit/etcd/initial-cluster s3 bucket. Worker nodes join the cluster by downloading the etcd initial-cluster file from the s3 bucket during their bootstrap.
+* Cluster discovery is managed with [stakater/etcd-aws-cluster](https://hub.docker.com/r/stakater/etcd-aws-cluster/) image. etcd cluster is formed by self-discover through its auto-scaling group and then an etcd initial cluster is updated automatically to s3://AWS-ACCOUNT-CLUSTER-NAME-cloudinit/CLUSTER-NAME_etcd/initial-cluster s3 bucket. Worker nodes join the cluster by downloading the etcd initial-cluster file from the s3 bucket during their bootstrap.
 * AWS resources are defined in resources and modules directories.
-The build process will copy all resource files from _resources_ to a _build_ directory. 
-The terraform actions are performed under _build_, which is ignored in .gitignore. The original Terraform files in the repo are kept intact. 
-* Makefiles and shell scripts are used to give us more flexibility on tasks Terraform 
-leftover. This provides stream-lined build automation. 
-* All nodes use a common bootstrap shell script as user-data, which downloads initial-cluster file 
-and nodes specific cloud-config.yaml to configure the node. If cloud-config changes, 
+The build process will copy all resource files from _resources_ to a _build_ directory.
+The terraform actions are performed under _build_, which is ignored in .gitignore. The original Terraform files in the repo are kept intact.
+* Makefiles and shell scripts are used to give us more flexibility on tasks Terraform
+leftover. This provides stream-lined build automation.
+* All nodes use a common bootstrap shell script as user-data, which downloads initial-cluster file
+and nodes specific cloud-config.yaml to configure the node. If cloud-config changes,
 no need to rebuild an instance. Just reboot it to pick up the change.
 * CoreOS AMI is generated on the fly to keep it up-to-data. Default channel can be changed in Makefile.
-* Terraform auto-generated launch configuration name and CBD feature are used 
-to allow launch configuration update on a live autoscaling group, 
+* Terraform auto-generated launch configuration name and CBD feature are used
+to allow launch configuration update on a live autoscaling group,
 however, running ec2 instances in the autoscaling group has to be recycled outside of the Terraform management to pick up the new LC.
-* For a production system, the security groups defined in etcd, worker, and admiral module 
+* For a production system, the security groups defined in etcd, worker, and admiral module
 should be carefully reviewed and tightened.
 
 
@@ -376,7 +376,7 @@ introduction to fleet: https://coreos.com/fleet/docs/latest/launching-containers
 1. Don't modify the cluster-name. If you do then please do update the "s3-cloudconfig-bootstrap.sh" as well. Specifically this path:
 
 ```
-# Bucket path for the cloud-config.yaml 
+# Bucket path for the cloud-config.yaml
 bucket=${accountId}-stakater-cloudinit
 ```
 
@@ -388,7 +388,7 @@ Global units will be run on all machines in the cluster.
 
 1.  The fleet logs (sudo journalctl -u fleet) will provide more clarity on what’s going on under the hood.
 
-2. There are two fleetctl commands to view units in the cluster: list-unit-files, which shows the units that fleet knows about and whether or not they are global, and list-units, which shows the current state of units actively loaded into machines in the cluster. 
+2. There are two fleetctl commands to view units in the cluster: list-unit-files, which shows the units that fleet knows about and whether or not they are global, and list-units, which shows the current state of units actively loaded into machines in the cluster.
 
 $ fleetctl list-unit-files
 
@@ -440,7 +440,7 @@ check status of a service
 systemctl status -l gocd
 
 
-# 
+#
 
 There’s a few things worth pointing out:
 
@@ -484,8 +484,8 @@ Step 3: to check logs of particular container/service
 
 journalctl -exu gocd-agent-1
 
-or 
+or
 
 journalctl -exu gocd-agent-cd-prod.service
 
-Step 4: 
+Step 4:

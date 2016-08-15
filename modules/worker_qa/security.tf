@@ -1,7 +1,7 @@
-resource "aws_security_group" "gocd"  {
-    name = "gocd"
+resource "aws_security_group" "worker_qa"  {
+    name = "worker_qa"
     vpc_id = "${var.vpc_id}"
-    description = "gocd"
+    description = "worker_qa"
 
     # Allow all outbound traffic
     egress {
@@ -11,11 +11,18 @@ resource "aws_security_group" "gocd"  {
       cidr_blocks = ["0.0.0.0/0"]
     }
 
-    # TODO: fix this port?
-    # Open gocd port
+    # Allow access to 4001 (fleet) inside VPC
     ingress {
-      from_port = 8153
-      to_port = 8153
+      from_port = 4001
+      to_port = 4001
+      protocol = "tcp"
+      cidr_blocks = [ "${var.vpc_cidr}" ]
+    }
+
+    # Allow access to applciation port
+    ingress {
+      from_port = "${var.application_from_port}"
+      to_port = "${var.application_to_port}"
       protocol = "tcp"
       cidr_blocks = [ "0.0.0.0/0" ]
     }
@@ -30,6 +37,6 @@ resource "aws_security_group" "gocd"  {
     }
 
     tags {
-      Name = "gocd"
+      Name = "worker_qa"
     }
 }

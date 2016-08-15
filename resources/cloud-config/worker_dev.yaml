@@ -1,0 +1,34 @@
+#cloud-config
+
+# worker_dev cloud-config
+coreos:
+  etcd2:
+    proxy: on
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+  fleet:
+    public-ip: $private_ipv4
+    metadata: "env=CLUSTER-NAME,platform=ec2,provider=aws,role=worker_dev"
+    etcd_key_prefix: "/stakater/dev/"
+  update:
+    reboot-strategy: off
+  units:
+    - name: etcd2.service
+      command: start
+      drop-ins:
+        - name: 60-initial-cluster.conf
+          content: |
+            [Service]
+            EnvironmentFile=/etc/sysconfig/initial-cluster
+    - name: fleet.service
+      command: start
+    - name: add-ip-to-etcd.service
+      command: start
+      content: |
+        [Unit]
+        Description=This unit adds instance ip as an etcd, so that it can be retrieved for using it as a fleet endpoint
+        After=etcd2.service
+        Requires=etcd2.service
+
+        [Service]
+        TimeoutStartSec=0
+        ExecStart=/usr/bin/sh -c "etcdctl set /stakater/dev/ip $private_ipv4"

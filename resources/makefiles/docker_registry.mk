@@ -1,10 +1,10 @@
-docker_registry: etcd plan_docker_registry upload_docker_registry_configs upload_docker_registry_userdata
+docker_registry: etcd route53 plan_docker_registry upload_docker_registry_configs upload_docker_registry_userdata
 	cd $(BUILD); \
 		$(SCRIPTS)/aws-keypair.sh -c docker_registry; \
 		$(TF_APPLY) -target module.docker_registry
 	@$(MAKE) docker_registry_ips
 
-plan_docker_registry: plan_etcd init_docker_registry
+plan_docker_registry: plan_etcd plan_route53 init_docker_registry
 	cd $(BUILD); \
 		$(TF_PLAN) -target module.docker_registry;
 

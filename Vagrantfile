@@ -23,6 +23,7 @@ Vagrant.configure("2") do |config|
   # argument is a set of non-required options.
   config.vm.synced_folder ".", "/home/vagrant/stakater"
   config.vm.synced_folder "~/.aws", "/home/vagrant/.aws"
+  config.vm.synced_folder "~/.stakater", "/home/vagrant/.stakater"
   config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
 
   # Get rid of stdin: not tty error

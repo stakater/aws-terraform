@@ -1,13 +1,14 @@
 #cloud-config
 
-# Workers cloud-config
+# worker_qa cloud-config
 coreos:
   etcd2:
     proxy: on
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
   fleet:
     public-ip: $private_ipv4
-    metadata: "env=CLUSTER-NAME,platform=ec2,provider=aws,role=worker"
+    metadata: "env=CLUSTER-NAME,platform=ec2,provider=aws,role=worker_qa"
+    etcd_key_prefix: "/stakater/qa/"
   update:
     reboot-strategy: off
   units:
@@ -20,18 +21,14 @@ coreos:
             EnvironmentFile=/etc/sysconfig/initial-cluster
     - name: fleet.service
       command: start
-    - name: update-window.service
+    - name: add-ip-to-etcd.service
       command: start
       content: |
         [Unit]
-        Description=Reboot if an update has been downloaded
-        ConditionPathExists=/opt/bin/update-window.sh
+        Description=This unit adds instance ip as an etcd, so that it can be retrieved for using it as a fleet endpoint
+        After=etcd2.service
+        Requires=etcd2.service
+
         [Service]
-        ExecStart=/opt/bin/update-window.sh
-    - name: update-window.timer
-      command: start
-      content: |
-        [Unit]
-        Description=Reboot timer
-        [Timer]
-        OnCalendar=*-*-* 05,06:00/30:00
+        TimeoutStartSec=0
+        ExecStart=/usr/bin/sh -c "etcdctl set /stakater/qa/ip $private_ipv4"

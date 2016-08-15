@@ -1,7 +1,10 @@
-variable "vpc_id" { }
-#variable "public_domain" { default="dockerage.com" }
-variable "private_domain" { }
-variable "docker_registry_private_ip" { }
+resource "aws_route53_zone" "public" {
+    name = "${var.public_domain}"
+
+    tags {
+        Name = "${var.public_domain}"
+    }
+}
 
 resource "aws_route53_zone" "private" {
     name = "${var.private_domain}"
@@ -12,13 +15,6 @@ resource "aws_route53_zone" "private" {
     }
 }
 
-resource "aws_route53_record" "registry_local" {
-  zone_id = "${aws_route53_zone.private.zone_id}"
-  name = "registry"
-  type = "A"
-  ttl = "5"
-  records = ["${var.docker_registry_private_ip}"]
-}
-
 output "private_zone_id" {value = "${aws_route53_zone.private.zone_id}" }
+output "public_zone_id" {value = "${aws_route53_zone.public.zone_id}" }
 output "private_domain" {value = "${var.private_domain}" }

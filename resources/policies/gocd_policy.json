@@ -18,7 +18,7 @@
         "s3:Get*"
       ],
       "Resource": [
-        "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/etcd/initial-cluster",
+        "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/CLUSTER-NAME_etcd/initial-cluster",
         "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/CLUSTER-NAME_gocd",
         "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-cloudinit/CLUSTER-NAME_gocd/*",
         "arn:aws:s3:::AWS-ACCOUNT-CLUSTER-NAME-config",
@@ -50,11 +50,23 @@
         "ec2:DeleteSnapshot",
         "ec2:DescribeSnapshots",
         "ec2:DescribeImages",
+        "ec2:DescribeVPCs",
         "ec2:RegisterImage",
         "ec2:CreateTags",
         "ec2:ModifyImageAttribute"
       ],
      "Resource": "*"
-    }
+   },
+   {
+     "Sid": "route53Policy",
+     "Action":[
+        "route53:ListHostedZones",
+        "route53:ChangeResourceRecordSets"
+     ],
+     "Effect":"Allow",
+     "Resource":[
+        "*"
+     ]
+   }
   ]
 }

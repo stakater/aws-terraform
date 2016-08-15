@@ -1,10 +1,10 @@
 module "gocd" {
     source = "../modules/gocd"
 
-    image_type = "t2.medium"
+    image_type = "t2.large"
     cluster_desired_capacity = 1
-    root_volume_size =  8
-    docker_volume_size =  12
+    root_volume_size =  40
+    docker_volume_size =  30
     keypair = "gocd"
     allow_ssh_cidr="0.0.0.0/0"
 

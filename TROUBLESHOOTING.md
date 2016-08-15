@@ -76,7 +76,7 @@ Global units will be run on all machines in the cluster.
 # What are `fleet` commands?
 
 Note: Make sure you fleet is running, if not
-run fleet by 
+run fleet by
 ```
 sudo systemctl start fleet
 ```
@@ -86,7 +86,7 @@ after starting fleet you must start etcd(or etcd2) again explicitly by
 sudo systemctl start etcd
 ```
 
-Fleet Commands: 
+Fleet Commands:
 ```
 fleetctl submit hello.service
 ```
@@ -119,13 +119,16 @@ To see whether the result is a directory or key, e.g. if there was one result `/
 etcdctl get /coreos.com
 ```
 it will return the value if it is a key or say that the given argument is a directory.
-You can use the `etcdctl ls <directory-path>` command again to browse further in the directory 
-Or use the `etcdctl get <key-path>` command to get value of the key 
+You can use the `etcdctl ls <directory-path>` command again to browse further in the directory
+Or use the `etcdctl get <key-path>` command to get value of the key
 
 To see list of all keys/directories in etcd
 ```
 etcdctl ls / --recursive
 ```
+
+For more information: https://www.digitalocean.com/community/tutorials/how-to-use-etcdctl-and-etcd-coreos-s-distributed-key-value-store
+
 # How to make a new shell script executable?
 
 ```
@@ -163,4 +166,4 @@ you can verify presence of your volume with `lsblk` command
 
 We have noticed that for some reason make instructions which create directories fail when the host machine OS is windows; the work around is to get into the vagrant machine and then clone the repo
 
- 
+

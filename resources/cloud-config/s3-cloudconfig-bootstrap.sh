@@ -61,10 +61,9 @@ bucket=${accountId}-CLUSTER-NAME-cloudinit
 cloudConfigYaml="${roleProfile}/cloud-config.yaml"
 
 # path to initial-cluster urls file
-# initial-cluster file will be in `etcd` folder instead of `CLUSTER-NAME_etcd` folder
-# as it is put in this folder by [dockerage/etcd-aws-cluster](https://hub.docker.com/r/dockerage/etcd-aws-cluster/) image
+# This file is uploaded by [stakater/etcd-aws-cluster](https://hub.docker.com/r/stakater/etcd-aws-cluster/) image
 # For more information refer to Tehcnical notes section in the project's README.md
-initialCluster="etcd/initial-cluster"
+initialCluster="CLUSTER-NAME_etcd/initial-cluster"
 
 # Find token, AccessKeyId,  line, remove leading space, quote, commas
 s3Token=$(get_value "Token")
@@ -183,6 +182,9 @@ then
   fileList+=()
   fileList+=("CLUSTER-NAME_gocd/conf/sudoers")
   fileList+=("CLUSTER-NAME_gocd/conf/cruise-config.xml")
+  fileList+=("CLUSTER-NAME_gocd/conf/passwd")
+  fileList+=("CLUSTER-NAME_gocd/route53/record-change-batch.json.tmpl")
+  fileList+=("CLUSTER-NAME_gocd/route53/substitite-record-values.sh")
 
   # Download all files in the list
   for f in "${fileList[@]}"
@@ -220,10 +222,31 @@ then
     # Change permissions of conf directory and all of its contents (wanted by gocd server)
     chown -R 999:999 ${confDir}
   fi
-fi
+  # if sudoers file is downloaded and valid, copy to `gocd-data` directory
+  if [ -f ${gocdDownloadDir}/passwd ]  ;
+  then
+    cp ${gocdDownloadDir}/passwd ${gocdDataDir}/passwd
+  fi
 
-# Delete temporary downloads folder
-rm -rf ${gocdDownloadDir}
+  # if record-change-batch.json.tmpl file is downloaded and valid, copy to `gocd-data` directory
+  if [ -f ${gocdDownloadDir}/record-change-batch.json.tmpl ] && grep -q "ResourceRecordSet" ${gocdDownloadDir}/record-change-batch.json.tmpl ;
+  then
+    route53Dir="${gocdDataDir}/route53/"
+    mkdir -p ${route53Dir}
+    cp ${gocdDownloadDir}/record-change-batch.json.tmpl ${route53Dir}/record-change-batch.json.tmpl
+  fi
+
+  # if record-change-batch.json.tmpl file is downloaded and valid, copy to `gocd-data` directory
+  if [ -f ${gocdDownloadDir}/substitite-record-values.sh ] ;
+  then
+    route53Dir="${gocdDataDir}/route53/"
+    mkdir -p ${route53Dir}
+    cp ${gocdDownloadDir}/substitite-record-values.sh ${route53Dir}/substitite-record-values.sh
+  fi
+
+  # Delete temporary downloads folder
+  rm -rf ${gocdDownloadDir}
+fi
 
 ########################################################################
 # Download CLUSTER-NAME-cloudinit/<profile>/clould-config.yaml

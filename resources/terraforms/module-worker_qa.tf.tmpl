@@ -1,0 +1,45 @@
+module "worker_qa" {
+    source = "../modules/worker_qa"
+
+    image_type = "t2.medium"
+    cluster_desired_capacity = 3
+    root_volume_size =  20
+    docker_volume_size =  10
+    keypair = "worker_qa"
+    allow_ssh_cidr="0.0.0.0/0"
+
+    # aws
+    aws_account_id="${var.aws_account.id}"
+    aws_region = "${var.aws_account.default_region}"
+    ami = "${var.ami}"
+
+    #cluster name
+    cluster_name = "${var.cluster_name}"
+
+    # vpc
+    vpc_id = "${module.vpc.vpc_id}"
+    vpc_cidr = "${module.vpc.vpc_cidr}"
+
+    # elb
+    http_instance_port = 8080
+    http_lb_port = 80
+    https_instance_port = 8080
+    https_lb_port = 443
+    iam_server_certificate_arn = "${module.server_certificate.server_certificate_arn}"
+    health_check_target = "HTTP:8080/"
+
+    # route53
+    route53_private_zone_id = "${module.route53.private_zone_id}"
+    route53_public_zone_id = "${module.route53.public_zone_id}"
+    route53_private_name = "worker-qa"
+    route53_public_name = "qa"
+
+    # qa app variables
+    application_from_port = "${var.qa_app_from_port}"
+    application_to_port = "${var.qa_app_to_port}"
+
+
+    # This placeholder will be replaced by ADMIRAL subnet id and availability zone variables
+    # For more information look into 'substitute-VPC-AZ-placeholders.sh'
+    <%MODULE-SUBNET-IDS-AND-AZS%>
+}
