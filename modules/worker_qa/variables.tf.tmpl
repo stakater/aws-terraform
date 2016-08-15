@@ -19,8 +19,16 @@ variable "vpc_cidr" { }
 # Elb vars
 variable "http_instance_port" { default = 8080 }
 variable "http_lb_port" { default = 80 }
+variable "https_instance_port" { default = 443 }
+variable "https_lb_port" { default = 443 }
 variable "health_check_target" { default = "HTTP:8080/"}
+variable "iam_server_certificate_arn" { }
+
+# route53 vars
 variable "route53_private_zone_id" { }
+variable "route53_public_zone_id" { }
+variable "route53_private_name" { }
+variable "route53_public_name" { }
 
 # Application port
 variable "application_from_port" { default = 8080 }
