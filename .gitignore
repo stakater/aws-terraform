@@ -36,7 +36,6 @@ resources/terraforms/module-worker_qa.tf
 resources/terraforms/module-worker_dev.tf
 resources/terraforms/module-application_launcher.tf
 resources/terraforms/module-aurora_db.tf
-resources/terraforms/module-dockerhub.tf
 resources/terraforms/module-elk.tf
 resources/terraforms/module-etcd.tf
 resources/terraforms/module-gocd.tf
