@@ -23,8 +23,16 @@ module "worker_qa" {
     # elb
     http_instance_port = 8080
     http_lb_port = 80
+    https_instance_port = 8080
+    https_lb_port = 443
+    iam_server_certificate_arn = "${module.server_certificate.server_certificate_arn}"
     health_check_target = "HTTP:8080/"
+
+    # route53
     route53_private_zone_id = "${module.route53.private_zone_id}"
+    route53_public_zone_id = "${module.route53.public_zone_id}"
+    route53_private_name = "worker-qa"
+    route53_public_name = "qa"
 
     # qa app variables
     application_from_port = "${var.qa_app_from_port}"
