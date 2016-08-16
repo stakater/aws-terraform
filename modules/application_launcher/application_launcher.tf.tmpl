@@ -60,12 +60,12 @@ resource "aws_iam_instance_profile" "application_launcher" {
 resource "aws_iam_role_policy" "application_launcher_policy" {
     name = "${var.cluster_name}_application_launcher_policy"
     role = "${aws_iam_role.application_launcher.id}"
-    policy = "${file(\"policies/application_launcher_policy.json\")}"
+    policy = "${file("policies/application_launcher_policy.json")}"
     depends_on = [ "aws_iam_role.application_launcher" ]
 }
 
 resource "aws_iam_role" "application_launcher" {
     name = "${var.cluster_name}_application_launcher"
     path = "/"
-    assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
+    assume_role_policy =  "${file("policies/assume_role_policy.json")}"
 }

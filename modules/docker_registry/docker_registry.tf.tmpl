@@ -50,13 +50,13 @@ resource "aws_iam_instance_profile" "docker_registry" {
 resource "aws_iam_role_policy" "docker_registry_policy" {
     name = "${var.cluster_name}_docker_registry"
     role = "${aws_iam_role.docker_registry.id}"
-    policy = "${file(\"policies/docker_registry_policy.json\")}"
+    policy = "${file("policies/docker_registry_policy.json")}"
 }
 
 resource "aws_iam_role" "docker_registry" {
     name = "${var.cluster_name}_docker_registry"
     path = "/"
-    assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
+    assume_role_policy =  "${file("policies/assume_role_policy.json")}"
 }
 
 resource "aws_route53_record" "registry_local" {
