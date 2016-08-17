@@ -114,11 +114,12 @@ destroy_all: \
 	destroy_application_launcher \
 	destroy_etcd \
 	destroy_efs \
+	destroy_aurora_db \
 	destroy_rds \
 	destroy_iam \
 	destroy_route53 \
+	destroy_server_certificate \
 	destroy_s3 \
-	destroy_aurora_db \
 	destroy_vpc
 
 clean_all: destroy_all

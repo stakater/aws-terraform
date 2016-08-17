@@ -1,7 +1,7 @@
 variable "allow_ssh_cidr" { default = "0.0.0.0/0" }
 variable "aws_region" { }
 variable "aws_account_id" { }
-variable "ami_baker_ami_id" { }
+variable "ami_id" { }
 variable "image_type" { default = "t2.micro" }
 variable "cluster_min_size" { default = 1 }
 variable "cluster_max_size" { default = 9 }
@@ -15,7 +15,19 @@ variable "cluster_name" { }
 # networking vars set by module.vpc
 variable "vpc_id" { }
 variable "vpc_cidr" { }
+# Elb vars
+variable "http_instance_port" { default = 8080 }
+variable "http_lb_port" { default = 80 }
+variable "https_instance_port" { default = 443 }
+variable "https_lb_port" { default = 443 }
+variable "health_check_target" { default = "HTTP:8080/"}
+variable "iam_server_certificate_arn" { }
 
+# route53 vars
+variable "route53_private_zone_id" { }
+variable "route53_public_zone_id" { }
+variable "route53_private_name" { }
+variable "route53_public_name" { }
 # This placeholder will be replaced by module subnet id and availability zone tf variable definations
 # For more information look into 'substitute-VPC-AZ-placeholders.sh'
 <%MODULE-SUBNET-VARIABLES%>

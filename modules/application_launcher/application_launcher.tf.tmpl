@@ -26,8 +26,8 @@ resource "aws_autoscaling_group" "application_launcher" {
 
 resource "aws_launch_configuration" "application_launcher" {
   # use system generated name to allow changes of launch_configuration
-  # name = "application_launcher-${var.ami_baker_ami_id}"
-  image_id = "${var.ami_baker_ami_id}"
+  # name = "application_launcher-${var.ami_id}"
+  image_id = "${var.ami_id}"
   instance_type = "${var.image_type}"
   iam_instance_profile = "${aws_iam_instance_profile.application_launcher.name}"
   security_groups = [ "${aws_security_group.application_launcher.id}" ]
@@ -46,7 +46,7 @@ resource "aws_launch_configuration" "application_launcher" {
     volume_size = "${var.docker_volume_size}"
   }
 
-  # Do not give user data, as this module will use user data from the ami_baker_ami_id
+  # Do not give user data, as this module will use user data from the ami_id
   #user_data = ""
 }
 

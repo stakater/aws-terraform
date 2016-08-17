@@ -1,0 +1,119 @@
+#
+# app_launcher load balancer configurations
+#
+
+#############
+# ELB
+#############
+resource "aws_elb" "app_launcher" {
+  name = "${var.cluster_name}-app-launcher-elb"
+  # This placeholder will be replaced by array of variables defined for VPC zone IDs in the module's variables
+  subnets = <%MODULE-ID-VARIABLES-ARRAY%>
+
+  listener {
+    instance_port = "${var.http_instance_port}"
+    instance_protocol = "http"
+    lb_port = "${var.http_lb_port}"
+    lb_protocol = "http"
+  }
+
+  listener {
+    instance_port = "${var.https_instance_port}"
+    instance_protocol = "http"
+    lb_port = "${var.https_lb_port}"
+    lb_protocol = "https"
+    ssl_certificate_id = "${var.iam_server_certificate_arn}"
+  }
+
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 3
+    target = "${var.health_check_target}"
+    interval = 30
+  }
+
+  cross_zone_load_balancing = true
+  idle_timeout = 400
+  connection_draining = true
+  connection_draining_timeout = 400
+
+  security_groups = [ "${aws_security_group.app_launcher_elb.id}" ]
+
+  tags {
+    Name = "${var.cluster_name}_app_launcher_elb"
+  }
+}
+
+#########################
+# ELB Stickiness policy
+#########################
+resource "aws_lb_cookie_stickiness_policy" "app_launcher_stickiness_policy" {
+      name = "${var.cluster_name}-app-launcher-elb-stickiness-policy"
+      load_balancer = "${aws_elb.app_launcher.id}"
+      lb_port = "${var.http_lb_port}"
+}
+
+###########################
+# Route53 DNS Registration
+###########################
+resource "aws_route53_record" "private-app-launcher" {
+  zone_id = "${var.route53_private_zone_id}"
+  name = "${var.route53_private_name}"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.app_launcher.dns_name}"
+    zone_id = "${aws_elb.app_launcher.zone_id}"
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "public-app-launcher" {
+  zone_id = "${var.route53_public_zone_id}"
+  name = "${var.route53_public_name}"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.app_launcher.dns_name}"
+    zone_id = "${aws_elb.app_launcher.zone_id}"
+    evaluate_target_health = true
+  }
+}
+
+#######################
+## ELB Security Group
+#######################
+resource "aws_security_group" "app_launcher_elb"  {
+    name = "app_launcher_elb"
+    vpc_id = "${var.vpc_id}"
+    description = "Security group for worker QA ELB"
+
+    # Allow all outbound traffic
+    egress {
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    # Allow access to HTTP ELB port
+    ingress {
+      from_port = "${var.http_lb_port}"
+      to_port = "${var.http_lb_port}"
+      protocol = "tcp"
+      cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    # Allow access to HTTPS ELB port
+    ingress {
+      from_port = "${var.https_lb_port}"
+      to_port = "${var.https_lb_port}"
+      protocol = "tcp"
+      cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    tags {
+      Name = "app_launcher_elb"
+    }
+}
