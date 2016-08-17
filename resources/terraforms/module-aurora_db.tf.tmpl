@@ -1,13 +1,25 @@
 module "aurora_db" {
     source = "../modules/aurora_db"
 
-    aurora_db_name = "mydb"
-    aurora_db_username = "demo"
-    aurora_db_password = "demodemodemo"
-    environment_name = "demoenv"
-
-    # vpc
+    cluster_name = "${var.cluster_name}"
     vpc_id = "${module.vpc.vpc_id}"
+
+    aurora_db_name = "${var.aurora_db_name}"
+    aurora_db_username = "${var.aurora_db_username}"
+    aurora_db_password = "${var.aurora_db_password}"
+
+    # DB Backup
+    backup_retention_period = 14
+    preferred_backup_window = "02:00-03:00"
+    preferred_maintenance_window = "wed:03:00-wed:04:00"
+
+    cluster_instance_count = "${var.aurora_db_instance_count}"
+    cluster_instance_class = "${var.aurora_db_instance_class}"
+    publicly_accessible = "${var.aurora_db_publicly_accessible}"
+
+    # route53
+    route53_private_zone_id = "${module.route53.private_zone_id}"
+    route53_private_name = "aurora-db"
 
     # This placeholder will be replaced by module subnet id and availability zone variables
     # For more information look into 'substitute-VPC-AZ-placeholders.sh'

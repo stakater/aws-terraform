@@ -30,6 +30,14 @@ DEV_APP_TO_PORT:= 8081
 QA_APP_FROM_PORT:= 8080
 QA_APP_TO_PORT:= 8081
 
+# Aurora DB variables
+AURORA_DB_NAME := mydb
+AURORA_DB_USERNAME := stakater
+AURORA_DB_PASSWORD := ok123456
+AURORA_DB_INSTANCE_COUNT := 1
+AURORA_DB_INSTANCE_CLASS := db.r3.large
+AURORA_DB_PUBLICLY_ACCESSIBLE := true
+
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
 VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker_dev,worker_qa,rds,aurora_db

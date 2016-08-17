@@ -20,6 +20,14 @@ DEV_APP_TO_PORT=${DEV_APP_TO_PORT}
 QA_APP_FROM_PORT=${QA_APP_FROM_PORT}
 QA_APP_TO_PORT=${QA_APP_TO_PORT}
 
+# aurora DB variables
+AURORA_DB_NAME=${AURORA_DB_NAME}
+AURORA_DB_USERNAME=${AURORA_DB_USERNAME}
+AURORA_DB_PASSWORD=${AURORA_DB_PASSWORD}
+AURORA_DB_INSTANCE_COUNT=${AURORA_DB_INSTANCE_COUNT}
+AURORA_DB_INSTANCE_CLASS=${AURORA_DB_INSTANCE_CLASS}
+AURORA_DB_PUBLICLY_ACCESSIBLE=${AURORA_DB_PUBLICLY_ACCESSIBLE}
+
 AWS_PROFILE=${AWS_PROFILE}
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 AWS_REGION=$($DIR/read_cfg.sh $HOME/.aws/config "profile $AWS_PROFILE" region)
@@ -59,4 +67,10 @@ variable "dev_app_from_port" { default = "${DEV_APP_FROM_PORT}"}
 variable "dev_app_to_port" { default = "${DEV_APP_TO_PORT}"}
 variable "qa_app_from_port" { default = "${QA_APP_FROM_PORT}"}
 variable "qa_app_to_port" { default = "${QA_APP_TO_PORT}"}
+variable "aurora_db_name" { default = "${AURORA_DB_NAME}"}
+variable "aurora_db_username" { default = "${AURORA_DB_USERNAME}"}
+variable "aurora_db_password" { default = "${AURORA_DB_PASSWORD}"}
+variable "aurora_db_instance_count" { default = "${AURORA_DB_INSTANCE_COUNT}"}
+variable "aurora_db_instance_class" { default = "${AURORA_DB_INSTANCE_CLASS}"}
+variable "aurora_db_publicly_accessible" { default = "${AURORA_DB_PUBLICLY_ACCESSIBLE}"}
 EOF
