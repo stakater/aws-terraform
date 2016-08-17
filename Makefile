@@ -30,9 +30,17 @@ DEV_APP_TO_PORT:= 8081
 QA_APP_FROM_PORT:= 8080
 QA_APP_TO_PORT:= 8081
 
+# Aurora DB variables
+AURORA_DB_NAME := mydb
+AURORA_DB_USERNAME := stakater
+AURORA_DB_PASSWORD := ok123456
+AURORA_DB_INSTANCE_COUNT := 1
+AURORA_DB_INSTANCE_CLASS := db.r3.large
+AURORA_DB_PUBLICLY_ACCESSIBLE := true
+
 # For gen-vpc-subnet-modules-tf.sh
 # Add all modules for which <module-name>-subnet.tf needs to be created
-VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker_dev,worker_qa,elb,rds,aurora_db
+VPC_SUBNET_MODULES=etcd,admiral,docker_registry,worker_dev,worker_qa,rds,aurora_db
 
 # Supported Subnet AWS availability zones
 # Update these values according to the zones available to your AWS account
@@ -88,7 +96,7 @@ all: worker
 
 help:
 	@echo "Usage: make (<resource> | destroy_<resource> | plan_<resource> | refresh_<resource> | show | graph )"
-	@echo "Available resources: vpc s3 route53 iam efs elb etcd worker_dev dockerhub admiral rds"
+	@echo "Available resources: vpc s3 route53 iam efs etcd worker_dev worker_qa docker_registry admiral rds"
 	@echo "For example: make plan_worker_dev # to show what resources are planned for worker_dev"
 
 destroy:
@@ -99,7 +107,6 @@ destroy:
 destroy_all: \
 	destroy_admiral \
 	destroy_docker_registry \
-	destroy_dockerhub \
 	destroy_gocd \
 	destroy_elk \
 	destroy_worker_qa \
@@ -107,7 +114,6 @@ destroy_all: \
 	destroy_application_launcher \
 	destroy_etcd \
 	destroy_efs \
-	destroy_elb \
 	destroy_rds \
 	destroy_iam \
 	destroy_route53 \

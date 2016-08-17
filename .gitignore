@@ -13,14 +13,10 @@ modules/worker_dev/worker_dev.tf
 modules/worker_dev/variables.tf
 modules/worker_dev/elb.tf
 modules/worker_qa/worker_qa.tf
-modules/worker_qa/elb.tf
 modules/worker_qa/variables.tf
+modules/worker_qa/elb.tf
 modules/application_launcher/application_launcher.tf
 modules/application_launcher/variables.tf
-modules/dockerhub/dockerhub.tf
-modules/dockerhub/variables.tf
-modules/elb/dockerhub.tf
-modules/elb/variables.tf
 modules/elk/elk.tf
 modules/elk/variables.tf
 modules/etcd/etcd.tf
@@ -36,12 +32,10 @@ modules/vpc/*-subnet.tf
 
 resources/terraforms/module-admiral.tf
 resources/terraforms/module-docker_registry.tf
-resources/terraforms/module-worker_dev.tf
 resources/terraforms/module-worker_qa.tf
+resources/terraforms/module-worker_dev.tf
 resources/terraforms/module-application_launcher.tf
 resources/terraforms/module-aurora_db.tf
-resources/terraforms/module-dockerhub.tf
-resources/terraforms/module-elb.tf
 resources/terraforms/module-elk.tf
 resources/terraforms/module-etcd.tf
 resources/terraforms/module-gocd.tf

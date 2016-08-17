@@ -1,10 +1,9 @@
-aurora_db: vpc plan_aurora_db
-	echo "This module is Work In Progress, It is not supported untill stakater upgrades to Terraform 0.7 or greater"
+aurora_db: vpc route53 plan_aurora_db
 	cd $(BUILD); \
 	$(TF_APPLY) -target module.aurora_db
 #TODO: make route53 too if using route53 in module
 
-plan_aurora_db: plan_vpc init_aurora_db
+plan_aurora_db: plan_vpc plan_route53 init_aurora_db
 	cd $(BUILD); \
 	$(TF_PLAN) -target module.aurora_db;
 

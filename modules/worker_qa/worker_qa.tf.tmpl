@@ -56,11 +56,11 @@ resource "aws_iam_instance_profile" "worker_qa" {
 resource "aws_iam_role_policy" "worker_qa_policy" {
     name = "${var.cluster_name}_worker_qa"
     role = "${aws_iam_role.worker_qa.id}"
-    policy = "${file(\"policies/worker_qa_policy.json\")}"
+    policy = "${file("policies/worker_qa_policy.json")}"
 }
 
 resource "aws_iam_role" "worker_qa" {
     name = "${var.cluster_name}_worker_qa"
     path = "/"
-    assume_role_policy =  "${file(\"policies/assume_role_policy.json\")}"
+    assume_role_policy =  "${file("policies/assume_role_policy.json")}"
 }

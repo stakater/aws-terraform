@@ -8,8 +8,8 @@ module "application_launcher" {
     allow_ssh_cidr="0.0.0.0/0"
 
     # aws
-    aws_account_id="${var.aws_account.id}"
-    aws_region = "${var.aws_account.default_region}"
+    aws_account_id="${var.aws_account["id"]}"
+    aws_region = "${var.aws_account["defailt_region"]}"
     ami_baker_ami_id = "${module.ami_baker.ami_baker_ami_id}"
 
     #cluster name

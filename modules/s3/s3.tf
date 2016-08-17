@@ -19,26 +19,6 @@ resource "aws_s3_bucket" "config" {
     }
 }
 
-# s3 bucket for jenkins backup data
-resource "aws_s3_bucket" "jenkins" {
-    bucket = "${var.bucket_prefix}-jenkins"
-    force_destroy = true
-    acl = "private"
-    tags {
-        Name = "Jenkins"
-    }
-}
-
-# s3 bucket for private docker registry
-resource "aws_s3_bucket" "dockerhub" {
-    bucket = "${var.bucket_prefix}-dockerhub"
-    force_destroy = true
-    acl = "private"
-    tags {
-        Name = "Dockerhub"
-    }
-}
-
 # s3 bucket for gocd
 resource "aws_s3_bucket" "gocd" {
     bucket = "${var.bucket_prefix}-gocd"

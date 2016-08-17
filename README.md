@@ -260,8 +260,8 @@ Resource | Description
 *efs* | EFS cluster
 *etcd* | Setup ETCD2 cluster
 *worker* | Setup application docker hosting cluster
-*admiral* | Central service cluster (Jenkins, fleet-ui, monitoring, logging, etc)
-*dockerhub* | Private docker registry cluster
+*admiral* | Central service cluster (fleet-ui, monitoring, logging, etc)
+*docker_registry* | Private docker registry cluster
 *rds* | RDS servers
 *cloudtrail* | Setup AWS CloudTrail
 

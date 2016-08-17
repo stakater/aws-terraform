@@ -3,6 +3,7 @@ worker_dev: vpc s3 iam route53 server_certificate plan_worker_dev upload_worker_
 		$(SCRIPTS)/aws-keypair.sh -c worker_dev; \
 		$(TF_APPLY) -target module.worker_dev
 	@$(MAKE) worker_dev_ips
+	@$(MAKE) worker_dev_elb_names
 
 plan_worker_dev: plan_vpc plan_s3 plan_iam plan_route53 plan_server_certificate init_worker_dev
 	cd $(BUILD); \
@@ -34,4 +35,7 @@ upload_worker_dev_userdata: init_build_dir
 worker_dev_ips:
 	@echo "worker_dev public ips: " `$(SCRIPTS)/get-ec2-public-id.sh worker_dev`
 
-.PHONY: worker_dev destroy_worker_dev refresh_worker_dev plan_worker_dev init_worker_dev clean_worker_dev upload_worker_dev_userdata worker_dev_ips
+worker_dev_elb_names:
+	@echo ELB names: `aws elb describe-load-balancers --profile $(AWS_PROFILE) | jq --raw-output '.LoadBalancerDescriptions[].DNSName'`
+
+.PHONY: worker_dev destroy_worker_dev refresh_worker_dev plan_worker_dev init_worker_dev clean_worker_dev upload_worker_dev_userdata worker_dev_ips worker_dev_elb_names
