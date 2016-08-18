@@ -17,6 +17,7 @@ modules/worker_qa/variables.tf
 modules/worker_qa/elb.tf
 modules/application_launcher/application_launcher.tf
 modules/application_launcher/variables.tf
+modules/application_launcher/elb.tf
 modules/elk/elk.tf
 modules/elk/variables.tf
 modules/etcd/etcd.tf

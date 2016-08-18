@@ -10,7 +10,7 @@ module "application_launcher" {
     # aws
     aws_account_id="${var.aws_account["id"]}"
     aws_region = "${var.aws_account["defailt_region"]}"
-    ami_baker_ami_id = "${module.ami_baker.ami_baker_ami_id}"
+    ami_id = ""
 
     #cluster name
     cluster_name = "${var.cluster_name}"
@@ -24,7 +24,21 @@ module "application_launcher" {
     vpc_id = "${module.vpc.vpc_id}"
     vpc_cidr = "${module.vpc.vpc_cidr}"
 
+    # elb
+    http_instance_port = 8080
+    http_lb_port = 80
+    https_instance_port = 8080
+    https_lb_port = 443
+    iam_server_certificate_arn = "${module.server_certificate.server_certificate_arn}"
+    health_check_target = "HTTP:8080/"
+
+    # route53
+    route53_private_zone_id = "${module.route53.private_zone_id}"
+    route53_public_zone_id = "${module.route53.public_zone_id}"
+    route53_private_name = "application"
+    route53_public_name = "application"
+
     # This placeholder will be replaced by MODULE subnet id and availability zone variables
     # For more information look into 'substitute-VPC-AZ-placeholders.sh'
-    <%BASEINSTANCE-SUBNET-IDS-AND-AZS%>
+    <%ADMIRAL-SUBNET-IDS-AND-AZS%>
 }
