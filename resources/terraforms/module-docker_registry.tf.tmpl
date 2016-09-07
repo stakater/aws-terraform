@@ -3,9 +3,9 @@ module "docker_registry" {
 
     image_type = "t2.medium"
     cluster_desired_capacity = 1
-    root_volume_size =  8
-    docker_volume_size =  30
-    data_volume_size =  30
+    root_volume_size =  50
+    docker_volume_size =  50
+    data_volume_size =  50
     keypair = "docker_registry"
     allow_ssh_cidr="0.0.0.0/0"
 
