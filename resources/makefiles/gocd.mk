@@ -37,7 +37,8 @@ upload_gocd_userdata: init_build_dir
 # uploads confing folder to config s3 bucket; by keeping the folder structure
 upload_gocd_configs:
 	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_gocd $(MODULES)/gocd/conf/ ; \
-	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_gocd $(MODULES)/gocd/route53/ ;
+	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_gocd $(MODULES)/gocd/route53/ ; \
+	$(SCRIPTS)/upload-config.sh ${CLUSTER_NAME}_gocd $(MODULES)/gocd/scripts/ ;
 
 .PHONY: gocd destroy_gocd refresh_gocd plan_gocd init_gocd upload_gocd_configs
 .PHONY: clean_gocd upload_gocd_userdata gocd_ips
