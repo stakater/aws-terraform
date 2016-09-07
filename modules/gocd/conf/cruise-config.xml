@@ -9,47 +9,32 @@
     <pipeline name="app-build-dev" template="stakater_build">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="BUILD_DOCKER_IMAGE"></param>
-        <param name="BUILD_DOCKER_IMAGE_OPTS">-v /home/app_${GO_PIPELINE_NAME}:/app </param>
-        <param name="BUILD_DOCKER_IMAGE_MAPPED_SRC_DIR">/app</param>
-        <param name="BUILT_WAR_FILE"></param>
-        <param name="APP_COMPILE_CMD"></param>
-        <param name="APP_TEST_CMD"></param>
-        <param name="APP_PACKAGE_CMD"></param>
-        <param name="APP_TEST_ARTIFACT">#{SOURCE_DIR}/</param>
-        <param name="APP_IMAGE_BUILD_DIR">./myApp</param>
-        <param name="APP_IMAGE_BUILD_VERSION">${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER}</param>
+        <param name="ENVIRONMENT">dev</param>
         <param name="APP_DOCKER_IMAGE"></param>
       </params>
       <materials>
-        <git url="" branch="master" />
+        <git url="" branch="develop" />
       </materials>
     </pipeline>
     <pipeline name="app-deploy-dev" template="stakater_deploy_cluster">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="APP_NAME">MyApp</param>
-        <param name="CLUSTER_ENV">dev</param>
-        <param name="ROUTE53_HOSTED_ZONE_NAME">coreos-cluster.local.</param>
+	<param name="CLUSTER_ENV">dev</param>
         <param name="APP_DOCKER_IMAGE"></param>
-        <param name="APP_DOCKER_OPTS"></param>
       </params>
       <materials>
-        <pipeline pipelineName="app-build-dev" stageName="Publish-Docker-Image" />
+        <pipeline pipelineName="app-build-dev" stageName="Build" />
       </materials>
     </pipeline>
     <pipeline name="app-deploy-qa" isLocked="false" template="stakater_deploy_cluster">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="APP_NAME">MyApp</param>
         <param name="CLUSTER_ENV">qa</param>
-        <param name="ROUTE53_HOSTED_ZONE_NAME">coreos-cluster.local.</param>
         <param name="APP_DOCKER_IMAGE"></param>
-        <param name="APP_DOCKER_OPTS"></param>
       </params>
       <timer>0 0 00 ? * MON-FRI</timer>
       <materials>
-        <git url="https://github.com/hazim1093/test-repo.git" autoUpdate="false" />
+        <git url="" autoUpdate="false" />
       </materials>
     </pipeline>
   </pipelines>
@@ -57,16 +42,7 @@
     <pipeline name="app-build-prod" template="stakater_build">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="BUILD_DOCKER_IMAGE"></param>
-        <param name="BUILD_DOCKER_IMAGE_OPTS">-v /home/app_${GO_PIPELINE_NAME}:/app</param>
-        <param name="BUILD_DOCKER_IMAGE_MAPPED_SRC_DIR">/app</param>
-        <param name="BUILT_WAR_FILE">/app/app.war</param>
-        <param name="APP_COMPILE_CMD"></param>
-        <param name="APP_TEST_CMD"></param>
-        <param name="APP_PACKAGE_CMD"></param>
-        <param name="APP_TEST_ARTIFACT">#{SOURCE_DIR}/</param>
-        <param name="APP_IMAGE_BUILD_DIR">./myApp</param>
-        <param name="APP_IMAGE_BUILD_VERSION">${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER}</param>
+        <param name="ENVIRONMENT">prod</param>
         <param name="APP_DOCKER_IMAGE"></param>
       </params>
       <materials>
@@ -76,159 +52,23 @@
     <pipeline name="app-deploy-prod" template="stakater_build_ami">
       <params>
         <param name="SOURCE_DIR" />
-        <param name="APP_IMAGE_BUILD_VERSION">${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER}</param>
-        <param name="APP_NAME">MyApp</param>
-        <param name="DOCKER_REGISTRY">registry.coreos-cluster.local:5000</param>
         <param name="APP_DOCKER_IMAGE"></param>
-        <param name="APP_DOCKER_OPTS"></param>
       </params>
       <materials>
-        <pipeline pipelineName="app-build-prod" stageName="Publish-Docker-Image" />
+        <pipeline pipelineName="app-build-prod" stageName="Build" />
       </materials>
     </pipeline>
   </pipelines>
   <templates>
     <pipeline name="stakater_build">
-      <stage name="Compile">
+      <stage name="Build">
         <jobs>
-          <job name="Compile">
+          <job name="Build">
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>sudo docker run -d --name build_img_${GO_PIPELINE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
+                <arg>/gocd-data/scripts/build-docker-image.sh #{ENVIRONMENT} ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} #{APP_DOCKER_IMAGE}</arg>
                 <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker cp ./ build_img_${GO_PIPELINE_NAME}:#{BUILD_DOCKER_IMAGE_MAPPED_SRC_DIR}</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker exec build_img_${GO_PIPELINE_NAME} /bin/bash -c "#{APP_COMPILE_CMD}"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker stop build_img_${GO_PIPELINE_NAME}</arg>
-                <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker rm -v build_img_${GO_PIPELINE_NAME}</arg>
-                <runif status="any" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="Test" fetchMaterials="false">
-        <jobs>
-          <job name="Unit_Test">
-            <tasks>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker run -d --name build_img_${GO_PIPELINE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
-                <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker exec build_img_${GO_PIPELINE_NAME} /bin/bash -c "#{APP_TEST_CMD}"</arg>
-                <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker stop build_img_${GO_PIPELINE_NAME}</arg>
-                <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker rm -v build_img_${GO_PIPELINE_NAME}</arg>
-                <runif status="any" />
-              </exec>
-            </tasks>
-            <artifacts>
-              <test src="#{APP_TEST_ARTIFACT}" />
-            </artifacts>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="Package" fetchMaterials="false">
-        <jobs>
-          <job name="Package">
-            <tasks>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker run -d --name build_img_${GO_PIPELINE_NAME} #{BUILD_DOCKER_IMAGE_OPTS} #{BUILD_DOCKER_IMAGE}</arg>
-                <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker exec build_img_${GO_PIPELINE_NAME} /bin/bash -c "#{APP_PACKAGE_CMD}"</arg>
-                <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker cp build_img_${GO_PIPELINE_NAME}:#{BUILT_WAR_FILE} #{APP_IMAGE_BUILD_DIR}/</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker stop build_img_${GO_PIPELINE_NAME}</arg>
-                <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker rm -v build_img_${GO_PIPELINE_NAME}</arg>
-                <runif status="any" />
-              </exec>
-            </tasks>
-          </job>
-        </jobs>
-      </stage>
-      <stage name="Publish-Docker-Image" fetchMaterials="false">
-        <jobs>
-          <job name="Publish">
-            <tasks>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker build -t #{APP_DOCKER_IMAGE} #{APP_IMAGE_BUILD_DIR}</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker push #{APP_DOCKER_IMAGE}</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>newTag=#{APP_DOCKER_IMAGE}:#{APP_IMAGE_BUILD_VERSION};\
-                     sudo docker tag -f #{APP_DOCKER_IMAGE} ${newTag}</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>newTag=#{APP_DOCKER_IMAGE}:#{APP_IMAGE_BUILD_VERSION};\
-                     sudo docker push ${newTag};
-                     echo "Delete Empty Docker Images ...";
-                     deleteImage()
-                     {
-                        images="sudo docker images | grep 'none' | awk '{print $3}' | xargs sudo docker rmi"
-                        echo "Deleting images..."
-                        bash -c "$images"
-                     }
-
-                     cmd="sudo docker images | grep 'none'"
-                     count=$(bash -c "$cmd")
-                     echo $count
-                     if [ -n "$count" ]
-                     then
-                       deleteImage || true
-                       echo "Images Deleted Successfully!"
-                     else
-                       echo "No empty Docker images found."
-                     fi</arg>
-                <runif status="passed" />
               </exec>
             </tasks>
           </job>
@@ -242,39 +82,7 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>git config --global user.email "you@example.com"
-                     git config --global user.name "Your Name"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>if [ ! -d "/app/application-unit" ]; then sudo mkdir -p /app/application-unit; sudo chown go:go /app/application-unit;fi; \
-                    if [ ! "$(ls -A /app/application-unit)" ]; then git clone https://github.com/stakater/application-unit.git /app/application-unit; else cd /app/application-unit; git pull origin master; fi;</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>cd /app/application-unit; ./substitute-Docker-vars.sh -f application.service.tmpl -d "#{APP_DOCKER_IMAGE}" -o "#{APP_DOCKER_OPTS}"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>cd /app/application-unit; sudo mv application.service application-#{APP_NAME}-#{CLUSTER_ENV}.service</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>host_ip=$(ip route show | awk '/default/ {print $3}');
-                     cluster_ip=$(curl -s -L http://${host_ip}:4001/v2/keys/stakater/#{CLUSTER_ENV}/ip | jq '.node.value' | sed s/\"//g);
-                     hosted_zone_id=$(aws route53 list-hosted-zones | jq '.HostedZones[] | select(.Name=="#{ROUTE53_HOSTED_ZONE_NAME}") | .Id')
-                     hosted_zone_id=${hosted_zone_id##*/}
-                     hosted_zone_id=${hosted_zone_id%%\"*}
-                     cd /gocd-data/route53;
-                     sudo ./substitite-record-values.sh -f record-change-batch.json.tmpl -i ${cluster_ip} -n #{APP_NAME}_#{CLUSTER_ENV}.#{ROUTE53_HOSTED_ZONE_NAME} -a "UPSERT"
-                     aws route53 change-resource-record-sets --hosted-zone-id ${hosted_zone_id} --change-batch file://record-change-batch.json
-                     cd /app/application-unit;
-                     fleetctl --etcd-key-prefix=/stakater/#{CLUSTER_ENV}/ --endpoint=http://${cluster_ip}:4001 destroy application-#{APP_NAME}-#{CLUSTER_ENV}.service
-                     fleetctl --etcd-key-prefix=/stakater/#{CLUSTER_ENV}/ --endpoint=http://${cluster_ip}:4001 start application-#{APP_NAME}-#{CLUSTER_ENV}.service</arg>
+                <arg>/gocd-data/scripts/deploy-to-cluster.sh #{CLUSTER_ENV} #{APP_DOCKER_IMAGE}</arg>
                 <runif status="passed" />
               </exec>
             </tasks>
@@ -290,37 +98,8 @@
             <tasks>
               <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
                 <arg>-c</arg>
-                <arg>if [ ! -d "/app/amibaker" ]; then sudo mkdir -p /app/amibaker;fi;  \
-                    if [ ! "$(ls -A /app/amibaker)" ]; then sudo git clone https://github.com/stakater/ami-baker.git /app/amibaker; fi</arg>
+                <arg>/gocd-data/scripts/build-ami.sh ${GO_PIPELINE_COUNTER}.${GO_STAGE_COUNTER} $(uuid -v4) #{APP_DOCKER_IMAGE}</arg>
                 <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>cd /app/amibaker;sudo git pull origin master;</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker run -d --name packer_${GO_PIPELINE_NAME} -v /app/amibaker:/usr/src/app stakater/packer</arg>
-                <runif status="any" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo cp -f /etc/registry_certificates/ca.crt /app/amibaker/baker-data/ca.crt;
-                     macAddress=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/);
-                     vpc_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/vpc-id);
-                     subnet_id=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$macAddress/subnet-id);
-                     aws_region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}');
-                     docker_registry_path="/etc/docker/certs.d/#{DOCKER_REGISTRY}"
-                     sudo docker exec packer_${GO_PIPELINE_NAME} /bin/bash -c  "./bake-ami.sh -r $aws_region -v $vpc_id -s $subnet_id \
-                                                                                -n #{APP_NAME}_#{APP_IMAGE_BUILD_VERSION} -d #{APP_DOCKER_IMAGE} \
-                                                                                -o \"#{APP_DOCKER_OPTS}\" -g $docker_registry_path"</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash" workingdir="#{SOURCE_DIR}">
-                <arg>-c</arg>
-                <arg>sudo docker rm -vf packer_${GO_PIPELINE_NAME}</arg>
-                <runif status="any" />
               </exec>
             </tasks>
           </job>
@@ -328,6 +107,48 @@
       </stage>
     </pipeline>
   </templates>
+  <environments>
+    <environment name="Build-Development">
+      <agents>
+        <physical uuid="" />
+      </agents>
+      <pipelines>
+        <pipeline name="app-build-dev" />
+      </pipelines>
+    </environment>
+    <environment name="Deploy-Development">
+      <agents>
+        <physical uuid="" />
+      </agents>
+      <pipelines>
+        <pipeline name="app-deploy-dev" />
+      </pipelines>
+    </environment>
+    <environment name="Test">
+      <agents>
+        <physical uuid="" />
+      </agents>
+      <pipelines>
+        <pipeline name="app-deploy-qa" />
+      </pipelines>
+    </environment>
+    <environment name="Build-Production">
+      <agents>
+        <physical uuid="" />
+      </agents>
+      <pipelines>
+        <pipeline name="app-build-prod" />
+      </pipelines>
+    </environment>
+    <environment name="Deploy-Production">
+      <agents>
+        <physical uuid="" />
+      </agents>
+      <pipelines>
+        <pipeline name="app-deploy-prod" />
+      </pipelines>
+    </environment>
+  </environments>
   <agents>
   </agents>
 </cruise>

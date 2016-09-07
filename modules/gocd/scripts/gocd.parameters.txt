@@ -1,0 +1,4 @@
+APP_NAME=<%=Application_Name%>
+DOCKER_REGISTRY=<%=Docker_Registery%>
+APP_DOCKER_OPTS=-p 8080:8080 -p 8443:8443 -p 443:443 -v /data_${GO_PIPELINE_NAME}/:/data/
+ROUTE53_HOSTED_ZONE_NAME=<%=Route53_Hosted_Zone_Name%>

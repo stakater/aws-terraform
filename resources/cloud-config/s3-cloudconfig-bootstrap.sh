@@ -185,6 +185,12 @@ then
   fileList+=("CLUSTER-NAME_gocd/conf/passwd")
   fileList+=("CLUSTER-NAME_gocd/route53/record-change-batch.json.tmpl")
   fileList+=("CLUSTER-NAME_gocd/route53/substitite-record-values.sh")
+  fileList+=("CLUSTER-NAME_gocd/scripts/build-ami.sh")
+  fileList+=("CLUSTER-NAME_gocd/scripts/build-docker-image.sh")
+  fileList+=("CLUSTER-NAME_gocd/scripts/deploy-to-cluster.sh")
+  fileList+=("CLUSTER-NAME_gocd/scripts/docker-cleanup.sh")
+  fileList+=("CLUSTER-NAME_gocd/scripts/gocd.parameteres.txt")
+  fileList+=("CLUSTER-NAME_gocd/scripts/read-parameter.sh")
 
   # Download all files in the list
   for f in "${fileList[@]}"
@@ -242,6 +248,34 @@ then
     route53Dir="${gocdDataDir}/route53/"
     mkdir -p ${route53Dir}
     cp ${gocdDownloadDir}/substitite-record-values.sh ${route53Dir}/substitite-record-values.sh
+  fi
+
+  # if script files from script folder have been dwnloaded, copy to `gocd-data` directory
+  gocdScriptsDir="${gocdDataDir}/scripts/"
+  mkdir -p ${gocdScriptsDir}
+  if [ -f ${gocdDownloadDir}/bake-ami.sh ] ;
+  then
+    cp ${gocdDownloadDir}/bake-ami.sh ${gocdScriptsDir}/bake-ami.sh
+  fi
+  if [ -f ${gocdDownloadDir}/build-docker-image.sh ] ;
+  then
+    cp ${gocdDownloadDir}/build-docker-image.sh ${gocdScriptsDir}/build-docker-image.sh
+  fi
+  if [ -f ${gocdDownloadDir}/deploy-to-cluster.sh ] ;
+  then
+    cp ${gocdDownloadDir}/deploy-to-cluster.sh ${gocdScriptsDir}/deploy-to-cluster.sh
+  fi
+  if [ -f ${gocdDownloadDir}/docker-cleanup.sh ] ;
+  then
+    cp ${gocdDownloadDir}/docker-cleanup.sh ${gocdScriptsDir}/docker-cleanup.sh
+  fi
+  if [ -f ${gocdDownloadDir}/gocd.parameters.txt ] ;
+  then
+    cp ${gocdDownloadDir}/gocd.parameters.txt ${gocdScriptsDir}/gocd.parameters.txt
+  fi
+  if [ -f ${gocdDownloadDir}/read-parameter.sh ] ;
+  then
+    cp ${gocdDownloadDir}/read-parameter.sh ${gocdScriptsDir}/read-parameter.sh
   fi
 
   # Delete temporary downloads folder

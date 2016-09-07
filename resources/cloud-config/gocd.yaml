@@ -64,11 +64,12 @@ coreos:
                 -e AGENT_KEY=123456789abcdef \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v /usr/bin/docker:/usr/bin/docker \
+                -v /opt/bin/docker-compose:/opt/bin/docker-compose \
                 -v /usr/lib/libdevmapper.so.1.02:/usr/lib/libdevmapper.so.1.02 \
                 -v /usr/lib64/libsystemd.so.0:/usr/lib/libsystemd.so.0 \
                 -v /usr/lib64/libgcrypt.so.20:/usr/lib/libgcrypt.so.20 \
                 -v /gocd-data/sudoers:/etc/sudoers.d \
-                -v /gocd-data/route53:/gocd-data/route53 \
+                -v /gocd-data:/gocd-data \
                 -v /usr/bin/fleetctl:/usr/bin/fleetctl \
                 -v /etc/registry_certificates:/etc/registry_certificates \
                 -v /app:/app \

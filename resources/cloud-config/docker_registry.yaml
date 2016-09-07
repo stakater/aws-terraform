@@ -84,15 +84,15 @@ coreos:
         TimeoutStartSec=300
         ExecStartPre=/usr/bin/docker pull paulczar/omgwtfssl
         ExecStartPre=-/usr/bin/docker rm -f %n
-        ExecStartPre=-/bin/mkdir -p /opt/registry/data
-        ExecStartPre=-/bin/mkdir -p /opt/registry/ssl
-        ExecStartPre=-/bin/mkdir -p /opt/registry/config
+        ExecStartPre=-/bin/mkdir -p /opt/data/registry/data
+        ExecStartPre=-/bin/mkdir -p /opt/data/registry/ssl
+        ExecStartPre=-/bin/mkdir -p /opt/data/registry/config
         ExecStart=/usr/bin/docker run --rm --name %n \
-                  -v /opt/registry/ssl:/certs \
+                  -v /opt/data/registry/ssl:/certs \
                   -e CA_SUBJECT=registry.CLUSTER-NAME.local \
                   -e SSL_DNS=registry.CLUSTER-NAME.local \
                   paulczar/omgwtfssl
-        ExecStop=/usr/bin/sh -c "/etc/scripts/upload-files.sh /opt/registry/ssl registry_certificates"
+        ExecStop=/usr/bin/sh -c "/etc/scripts/upload-files.sh /opt/data/registry/ssl registry_certificates"
         Restart=on-failure
         RestartSec=5s
     - name: registry.service
@@ -109,7 +109,7 @@ coreos:
         ExecStartPre=/usr/bin/docker pull registry:2
         ExecStartPre=-/usr/bin/docker rm -f %n
         ExecStart=/usr/bin/docker run  --rm --name %n -p 5000:5000 \
-                  -v /opt/registry:/opt/registry \
+                  -v /opt/data/registry:/opt/registry \
                   -e REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/opt/registry/data \
                   -e REGISTRY_HTTP_TLS_KEY=/opt/registry/ssl/key.pem \
                   -e REGISTRY_HTTP_TLS_CERTIFICATE=/opt/registry/ssl/cert.pem \
